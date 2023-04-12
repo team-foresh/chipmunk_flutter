@@ -1,5 +1,6 @@
 import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/data/auth_service.dart';
+import 'package:chipmunk_flutter/data/db/user_repository.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -28,13 +29,18 @@ init() async {
     anonKey:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inppamhrb25paHJpd2ZyZmZlZndtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MTE3MDU1MSwiZXhwIjoxOTk2NzQ2NTUxfQ.qdyZq-TWQQ41azrCCgax0Y0mN4iNAaNXdF69lngJPOI",
     debug: false,
+    schema: 'public',
   );
 
-  /// 계정 세션.
+  /// DB.
+  initRepository();
+
+  /// 계정 서비스..
   serviceLocator.registerLazySingleton<AuthService>(
     () => AuthService(
-      Supabase.instance.client.auth,
-      sharedPreferences,
+      authClient: Supabase.instance.client.auth,
+      userRepository: serviceLocator<UserRepository>(),
+      preferences: sharedPreferences,
     ),
   );
 
@@ -43,6 +49,10 @@ init() async {
 
   /// SharedPreferences
   serviceLocator.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+}
+
+void initRepository() {
+  serviceLocator.registerLazySingleton<UserRepository>(() => UserRepository(Supabase.instance.client));
 }
 
 /// 로거.
