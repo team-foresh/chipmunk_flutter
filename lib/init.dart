@@ -1,5 +1,6 @@
 import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/data/auth_service.dart';
+import 'package:chipmunk_flutter/data/db/board_repository.dart';
 import 'package:chipmunk_flutter/data/db/user_repository.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -53,6 +54,10 @@ init() async {
 
 void initRepository() {
   serviceLocator.registerLazySingleton<UserRepository>(() => UserRepository(Supabase.instance.client));
+  serviceLocator.registerLazySingleton<BoardRepository>(() => BoardRepository(
+      Supabase.instance.client,
+      serviceLocator<UserRepository>(),
+  ));
 }
 
 /// 로거.

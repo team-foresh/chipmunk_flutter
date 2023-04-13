@@ -1,4 +1,4 @@
-import 'package:chipmunk_flutter/presentation/home_page.dart';
+import 'package:chipmunk_flutter/presentation/board/board_page.dart';
 import 'package:chipmunk_flutter/presentation/login_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ class ChipmunkRouter {
 
   static var homeHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
-      return const HomePage();
+      return BoardPage();
     },
   );
 

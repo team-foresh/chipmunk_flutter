@@ -18,7 +18,7 @@ class AuthService {
     required this.preferences,
   });
 
-  /// 로그인.
+  // 로그인.
   Future<bool> signInWithEmail({
     required String email,
     required String password,
@@ -27,13 +27,16 @@ class AuthService {
       final response = await authClient.signInWithPassword(email: email, password: password);
       _persistSession(response.session!);
       return true;
-    } catch (e) {
+    } on AuthException catch (e) {
       ChipmunkLogger.error('SignInWithEmail:: 로그인 실패. ${e.toString()}');
-      return false;
+      throw AuthFailure(
+        errorCode: e.statusCode,
+        errorMessage: e.message,
+      );
     }
   }
 
-  /// 회원가입.
+  // 회원가입.
   Future<bool> signUpWithEmail({
     required String email,
     required String password,
@@ -41,22 +44,29 @@ class AuthService {
     try {
       if (!await userRepository.isEmailAlreadyRegistered(email)) {
         await authClient.signUp(email: email, password: password);
-        userRepository.signUp(email);
+        userRepository.insert(email);
       }
       return true;
-    } on AuthFailure catch (e) {
-      ChipmunkLogger.error('SignUpWithEmail:: 회원가입 실패. ${e.toString()}');
+    } on UserFailure catch (e) {
+      ChipmunkLogger.error('UserFailure:: 회원가입 실패. ${e.toString()}');
       rethrow;
+    } on AuthException catch (e) {
+      ChipmunkLogger.error('AuthException:: 회원가입 실패. ${e.toString()}');
+      throw AuthFailure(
+        errorCode: e.statusCode,
+        errorMessage: e.message,
+      );
     }
   }
 
+  // 로그아웃.
   Future<bool> signOut() async {
     try {
       await authClient.signOut();
       return true;
     } catch (e) {
       ChipmunkLogger.error('SignOut:: 로그아웃 실패. ${e.toString()}');
-      return false;
+      rethrow;
     }
   }
 
@@ -65,6 +75,7 @@ class AuthService {
     await preferences.setString(supabaseSessionKey, session.persistSessionString);
   }
 
+  // 세션 복구.
   Future<String> recoverSession() async {
     try {
       if (preferences.containsKey(supabaseSessionKey)) {
@@ -83,15 +94,4 @@ class AuthService {
       return Routes.loginRoute;
     }
   }
-
-// // 이메일이 이미 가입되었는지 확인
-// Future<bool> isEmailAlreadyRegistered(String email) async {
-//   final response = await _client.from('auth.users').select('email').eq('email', email);
-//
-//   if (response.error != null) {
-//     throw response.error!;
-//   }
-//
-//   return response.data != null && response.data!.isNotEmpty;
-// }
 }

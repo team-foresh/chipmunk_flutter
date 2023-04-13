@@ -16,18 +16,38 @@ class UserRepository {
       ChipmunkLogger.debug('IsEmailAlreadyRegistered:: ${response}');
       return response.isNotEmpty;
     } on PostgrestException catch (e) {
-      throw AuthFailure(
+      throw UserFailure(
         errorMessage: e.message,
+        errorCode: e.code,
       );
     }
   }
 
-  Future<void> signUp(String email) async {
+  // 회원가입.
+  Future<void> insert(String email) async {
     try {
       await _client.from(tableName).insert({'email': email});
     } on PostgrestException catch (e) {
-      throw AuthFailure(
+      throw UserFailure(
         errorMessage: e.message,
+        errorCode: e.code,
+      );
+    }
+  }
+
+  // 프로필 이미지 업데이트.
+  Future<bool> updateProfile(String path) async {
+    try {
+      await _client.from(tableName).update(
+        {'profile': path},
+      ).match(
+        {"email": _client.auth.currentUser?.email},
+      );
+      return true;
+    } on PostgrestException catch (e) {
+      throw UserFailure(
+        errorMessage: e.message,
+        errorCode: e.code,
       );
     }
   }
