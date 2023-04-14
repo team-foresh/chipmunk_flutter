@@ -1,34 +1,20 @@
 import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:chipmunk_flutter/data/chipmunk_error.dart';
+import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:supabase/supabase.dart';
 
-class UserRepository {
+class UserService {
   final SupabaseClient _client;
 
   final tableName = "users";
 
-  UserRepository(this._client);
-
-  // 이미 가입된 이메일인지 확인.
-  Future<bool> isEmailAlreadyRegistered(String email) async {
-    try {
-      final List<dynamic> response = await _client.from(tableName).select('email').eq('email', email);
-      ChipmunkLogger.debug('IsEmailAlreadyRegistered:: ${response}');
-      return response.isNotEmpty;
-    } on PostgrestException catch (e) {
-      throw UserFailure(
-        errorMessage: e.message,
-        errorCode: e.code,
-      );
-    }
-  }
+  UserService(this._client);
 
   // 회원가입.
   Future<void> insert(String email) async {
     try {
       await _client.from(tableName).insert({'email': email});
     } on PostgrestException catch (e) {
-      throw UserFailure(
+      throw PostgrestFailure(
         errorMessage: e.message,
         errorCode: e.code,
       );
@@ -45,7 +31,7 @@ class UserRepository {
       );
       return true;
     } on PostgrestException catch (e) {
-      throw UserFailure(
+      throw PostgrestFailure(
         errorMessage: e.message,
         errorCode: e.code,
       );

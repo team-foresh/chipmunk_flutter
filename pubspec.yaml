@@ -3,7 +3,7 @@ description: chipmunk
 
 # apk > flutter build apk —release --flavor dev -t lib/main/dev.dart
 # 빌드 > flutter packages pub run build_runner build --delete-conflicting-outputs
-# assets > fluttergen -c /Users/hyeokshin/StudioProjects/fortune-flutter/pubspec.yaml
+# assets > fluttergen -c /Users/hyeokshin/StudioProjects/chipmunk_flutter/pubspec.yaml
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 

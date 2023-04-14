@@ -24,7 +24,7 @@ class ChipmunkScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar ?? const FortuneEmptyAppBar(),
+      appBar: appBar ?? const ChipmunkEmptyAppBar(),
       bottomSheet: bottomSheet,
       body: SafeArea(
         bottom: bottom ?? true,
@@ -38,8 +38,8 @@ class ChipmunkScaffold extends StatelessWidget {
   }
 }
 
-class FortuneEmptyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const FortuneEmptyAppBar({super.key});
+class ChipmunkEmptyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const ChipmunkEmptyAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class FortuneEmptyAppBar extends StatelessWidget implements PreferredSizeWidget 
   Size get preferredSize => const Size(0.0, 0.0);
 }
 
-abstract class FortuneCustomAppBar {
+abstract class ChipmunkCustomAppBar {
   static leadingAppBar(
     BuildContext context, {
     required String title,

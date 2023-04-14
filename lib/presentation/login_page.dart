@@ -1,7 +1,9 @@
 import 'package:chipmunk_flutter/core/util/textstyle.dart';
-import 'package:chipmunk_flutter/data/auth_service.dart';
+import 'package:chipmunk_flutter/data/service/auth_service.dart';
+import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/init.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage();
@@ -14,20 +16,34 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _signUp() {
+  void _signUp() async {
     final AuthService authService = serviceLocator<AuthService>();
-    authService.signUpWithEmail(
-      email: "melow2@naver.com",
-      password: "12345678",
-    );
+    await authService
+        .signUpWithPhoneNumber(
+          phoneNumber: "+821049307013",
+          password: "12345678",
+        )
+        .then(
+          (res) => res.fold(
+            (l) {},
+            (r) => authService.persistSession(r.session!),
+          ),
+        );
   }
 
-  void _signIn() {
+  void _signIn() async {
     final AuthService authService = serviceLocator<AuthService>();
-    authService.signInWithEmail(
-      email: "melow2@naver.com",
-      password: "12345678",
-    );
+    await authService
+        .signInWithPhoneNumber(
+          phoneNumber: "+821049307013",
+          password: "12345678",
+        )
+        .then(
+          (res) => res.fold(
+            (l) {},
+            (r) => authService.persistSession(r.session!),
+          ),
+        );
   }
 
   @override

@@ -1,4 +1,4 @@
-import 'package:chipmunk_flutter/data/auth_service.dart';
+import 'package:chipmunk_flutter/data/service/auth_service.dart';
 import 'package:chipmunk_flutter/env.dart';
 import 'package:chipmunk_flutter/presentation/supa_notes_app.dart';
 import 'package:easy_localization/easy_localization.dart';

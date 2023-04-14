@@ -1,9 +1,7 @@
 import 'package:chipmunk_flutter/core/widgets/chipmunk_scaffold.dart';
-import 'package:chipmunk_flutter/data/db/board_repository.dart';
+import 'package:chipmunk_flutter/data/service/board_service.dart';
 import 'package:chipmunk_flutter/init.dart';
 import 'package:flutter/material.dart';
-
-import '../../core/util/image_picker.dart';
 
 class Post {
   final String image;
@@ -45,8 +43,8 @@ class BoardPage extends StatelessWidget {
   Widget _buildCard(Post post) {
     return GestureDetector(
       onTap: () {
-        BoardRepository repository = serviceLocator<BoardRepository>();
-        repository.getMyBoards();
+        BoardService repository = serviceLocator<BoardService>();
+        // repository.getMyBoards();
       },
       child: Card(
         elevation: 4,

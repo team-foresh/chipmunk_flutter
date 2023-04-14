@@ -1,8 +1,11 @@
 import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:chipmunk_flutter/data/auth_service.dart';
-import 'package:chipmunk_flutter/data/db/board_repository.dart';
-import 'package:chipmunk_flutter/data/db/user_repository.dart';
+import 'package:chipmunk_flutter/data/service/auth_service.dart';
+import 'package:chipmunk_flutter/data/service/board_service.dart';
+import 'package:chipmunk_flutter/data/service/country_code_service.dart';
+import 'package:chipmunk_flutter/data/service/user_service.dart';
+import 'package:chipmunk_flutter/domain/country_repository.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
+import 'package:chipmunk_flutter/presentation/countrycode/bloc/country_code.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -10,13 +13,15 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'presentation/phonenumber/bloc/phone_number_bloc.dart';
+
 final serviceLocator = GetIt.instance;
 
 init() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /// 로거 초기화.
-  await initAppLogger();
+  await _initAppLogger();
 
   /// 다국어 설정.
   await EasyLocalization.ensureInitialized();
@@ -31,16 +36,25 @@ init() async {
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inppamhrb25paHJpd2ZyZmZlZndtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MTE3MDU1MSwiZXhwIjoxOTk2NzQ2NTUxfQ.qdyZq-TWQQ41azrCCgax0Y0mN4iNAaNXdF69lngJPOI",
     debug: false,
     schema: 'public',
+    headers: {
+      'apikey':
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inppamhrb25paHJpd2ZyZmZlZndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODExNzA1NTEsImV4cCI6MTk5Njc0NjU1MX0.BiXrxBGJVHpbdQWZGLhQD5tDPxU7ZrILVElac_ZP6P4'
+    },
   );
 
-  /// DB.
-  initRepository();
+  /// data.
+  _initService();
 
-  /// 계정 서비스..
+  /// domain.
+  _initRepository();
+
+  /// Bloc.
+  _initBloc();
+
+  /// 계정 서비스.
   serviceLocator.registerLazySingleton<AuthService>(
     () => AuthService(
       authClient: Supabase.instance.client.auth,
-      userRepository: serviceLocator<UserRepository>(),
       preferences: sharedPreferences,
     ),
   );
@@ -52,16 +66,36 @@ init() async {
   serviceLocator.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 }
 
-void initRepository() {
-  serviceLocator.registerLazySingleton<UserRepository>(() => UserRepository(Supabase.instance.client));
-  serviceLocator.registerLazySingleton<BoardRepository>(() => BoardRepository(
+_initService() {
+  serviceLocator.registerLazySingleton<UserService>(
+    () => UserService(
       Supabase.instance.client,
-      serviceLocator<UserRepository>(),
-  ));
+    ),
+  );
+  serviceLocator.registerLazySingleton<BoardService>(
+    () => BoardService(
+      Supabase.instance.client,
+      serviceLocator<UserService>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<CountryCodeService>(
+    () => CountryCodeService(
+      Supabase.instance.client,
+    ),
+  );
+}
+
+_initRepository() {
+  serviceLocator.registerLazySingleton<CountryCodeRepository>(
+    () => CountryCodeRepository(
+      countryCodeService: serviceLocator<CountryCodeService>(),
+    ),
+  );
 }
 
 /// 로거.
-initAppLogger() {
+_initAppLogger() {
   final appLogger = AppLogger(
     Logger(
       printer: PrettyPrinter(
@@ -82,4 +116,14 @@ initAppLogger() {
 
   /// 앱로거.
   serviceLocator.registerLazySingleton<AppLogger>(() => appLogger);
+}
+
+/// Bloc.
+_initBloc() {
+  serviceLocator.registerFactory(() => PhoneNumberBloc());
+  serviceLocator.registerFactory(
+    () => CountryCodeBloc(
+      countryCodeRepository: serviceLocator<CountryCodeRepository>(),
+    ),
+  );
 }
