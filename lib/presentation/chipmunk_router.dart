@@ -1,6 +1,7 @@
 import 'package:chipmunk_flutter/presentation/board/board_page.dart';
 import 'package:chipmunk_flutter/presentation/countrycode/country_code_page.dart';
-import 'package:chipmunk_flutter/presentation/phonenumber/phone_number_page.dart';
+import 'package:chipmunk_flutter/presentation/join/join_page.dart';
+import 'package:chipmunk_flutter/presentation/login/login_page.dart';
 import 'package:chipmunk_flutter/presentation/smsverify/sms_verify_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,13 @@ class ChipmunkRouter {
 
   static var phoneNumberHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
-      return const PhoneNumberPage();
+      return const LoginPage();
+    },
+  );
+
+  static var joinHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
+      return const JoinPage();
     },
   );
 
@@ -47,7 +54,7 @@ class ChipmunkRouter {
 
       /// 로그인.
       ..define(
-        Routes.phoneNumberRoute,
+        Routes.loginRoute,
         handler: phoneNumberHandler,
         transitionType: TransitionType.fadeIn,
       )
@@ -66,10 +73,17 @@ class ChipmunkRouter {
         transitionType: TransitionType.fadeIn,
       )
 
-      /// 국가코드
+      /// 국가코드.
       ..define(
         Routes.countryCodeRoute,
         handler: countryCodeHandler,
+        transitionType: TransitionType.fadeIn,
+      )
+
+      /// 회원가입.
+      ..define(
+        Routes.joinRoute,
+        handler: joinHandler,
         transitionType: TransitionType.fadeIn,
       );
   }
@@ -77,7 +91,8 @@ class ChipmunkRouter {
 
 class Routes {
   static const String homeRoute = 'homeRoute';
-  static const String phoneNumberRoute = 'phoneNumberRoute';
+  static const String loginRoute = 'loginRoute';
+  static const String joinRoute = 'joinRoute';
   static const String smsCertifyRoute = 'smsCertifyRoute';
   static const String countryCodeRoute = 'countryCodeRoute';
 }

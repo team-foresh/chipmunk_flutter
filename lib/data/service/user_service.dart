@@ -22,7 +22,7 @@ class UserService {
       throw CommonFailure(
         errorCode: e.code,
         errorMessage: e.message,
-        exposureMessage: "이미 가입된 회원입니다.",
+        exposureMessage: "회원가입 실패.",
       );
     } catch (e) {
       throw UnknownFailure(
@@ -98,7 +98,12 @@ class UserService {
       throw CommonFailure(
         errorCode: e.code,
         errorMessage: e.message,
-        exposureMessage: "사용자 검색 실패",
+        exposureMessage: "사용자를 찾을 수 없습니다",
+      );
+    } on CommonFailure catch (e) {
+      throw CommonFailure(
+        errorCode: null,
+        errorMessage: e.toString(),
       );
     } catch (e) {
       throw UnknownFailure(

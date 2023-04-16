@@ -1,4 +1,3 @@
-import 'package:chipmunk_flutter/presentation/phonenumber/component/country_code.dart';
 import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

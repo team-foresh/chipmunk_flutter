@@ -16,7 +16,7 @@ class AuthRepository {
   });
 
   // 로그인.
-  Future<ChipmunkResult<bool>> signIn({
+  Future<ChipmunkResult<void>> signIn({
     required String phoneNumber,
     required String password,
   }) async {
@@ -26,7 +26,7 @@ class AuthRepository {
         final response = await authService.signIn(phoneNumber: phoneNumber, password: password);
         return Right(response);
       } else {
-        return const Right(false);
+        throw const CommonFailure(exposureMessage: "가입된 사용자가 없습니다.");
       }
     } on ChipmunkFailure catch (e) {
       ChipmunkLogger.error(
@@ -78,6 +78,8 @@ class AuthRepository {
       );
       // 인증 처리.
       await userService.update(phoneNumber, verified: true);
+      // 세션 저장.
+      await authService.persistSession(response.session!);
       return Right(response);
     } on ChipmunkFailure catch (e) {
       ChipmunkLogger.error(

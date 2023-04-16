@@ -1,44 +1,43 @@
 import 'dart:async';
 
 import 'package:bloc_event_transformers/bloc_event_transformers.dart';
-import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/core/util/validators.dart';
 import 'package:chipmunk_flutter/domain/repository/auth_repository.dart';
+import 'package:chipmunk_flutter/domain/repository/user_respository.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:side_effect_bloc/side_effect_bloc.dart';
 
-import 'phone_number.dart';
+import 'login.dart';
 
-class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
-    with SideEffectBlocMixin<PhoneNumberEvent, PhoneNumberState, PhoneNumberSideEffect> {
+class LoginBloc extends Bloc<LoginEvent, LoginState> with SideEffectBlocMixin<LoginEvent, LoginState, LoginSideEffect> {
   AuthRepository authRepository;
 
   static const tag = "[PhoneNumberBloc]";
 
-  PhoneNumberBloc({
+  LoginBloc({
     required this.authRepository,
-  }) : super(PhoneNumberState.initial()) {
-    on<PhoneNumberInit>(init);
-    on<PhoneNumberInput>(
+  }) : super(LoginState.initial()) {
+    on<LoginInit>(init);
+    on<LoginPhoneNumberInput>(
       phoneNumberInput,
       transformer: debounce(
         const Duration(milliseconds: 200),
       ),
     );
-    on<PhoneNumberPasswordInput>(
+    on<LoginPasswordInput>(
       passwordInput,
       transformer: debounce(
         const Duration(milliseconds: 200),
       ),
     );
-    on<PhoneNumberCancel>(phoneNumberCancel);
-    on<PhoneNumberPasswordCancel>(passwordCancel);
-    on<PhoneNumberChangeCountryCode>(changeCountryCode);
-    on<PhoneNumberBottomButtonClick>(clickNextButton);
+    on<LoginPhoneNumberCancel>(phoneNumberCancel);
+    on<LoginPasswordCancel>(passwordCancel);
+    on<LoginChangeCountryCode>(changeCountryCode);
+    on<LoginBottomButtonClick>(clickNextButton);
   }
 
-  FutureOr<void> init(PhoneNumberInit event, Emitter<PhoneNumberState> emit) {
+  FutureOr<void> init(LoginInit event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
         countryCode: event.countryCode ?? state.countryCode,
@@ -47,7 +46,7 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
     );
   }
 
-  FutureOr<void> phoneNumberInput(PhoneNumberInput event, Emitter<PhoneNumberState> emit) {
+  FutureOr<void> phoneNumberInput(LoginPhoneNumberInput event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
         phoneNumber: event.phoneNumber,
@@ -56,7 +55,7 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
     );
   }
 
-  FutureOr<void> phoneNumberCancel(PhoneNumberCancel event, Emitter<PhoneNumberState> emit) {
+  FutureOr<void> phoneNumberCancel(LoginPhoneNumberCancel event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
         phoneNumber: "",
@@ -65,7 +64,7 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
     );
   }
 
-  FutureOr<void> changeCountryCode(PhoneNumberChangeCountryCode event, Emitter<PhoneNumberState> emit) {
+  FutureOr<void> changeCountryCode(LoginChangeCountryCode event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
         countryCode: event.countryCode,
@@ -74,7 +73,7 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
     );
   }
 
-  FutureOr<void> passwordInput(PhoneNumberPasswordInput event, Emitter<PhoneNumberState> emit) {
+  FutureOr<void> passwordInput(LoginPasswordInput event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
         password: event.password,
@@ -83,7 +82,7 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
     );
   }
 
-  FutureOr<void> passwordCancel(PhoneNumberPasswordCancel event, Emitter<PhoneNumberState> emit) {
+  FutureOr<void> passwordCancel(LoginPasswordCancel event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
         password: "",
@@ -92,7 +91,7 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
     );
   }
 
-  FutureOr<void> clickNextButton(PhoneNumberBottomButtonClick event, Emitter<PhoneNumberState> emit) async {
+  FutureOr<void> clickNextButton(LoginBottomButtonClick event, Emitter<LoginState> emit) async {
     String phoneNumber = state.phoneNumber;
     String countryCode = state.countryCode;
     String internationalPhoneNumber = phoneNumber.replaceFirst("0", countryCode);
@@ -103,18 +102,9 @@ class PhoneNumberBloc extends Bloc<PhoneNumberEvent, PhoneNumberState>
         )
         .then(
           (value) => value.fold(
-            (l) => produceSideEffect(PhoneNumberError(l)),
-            (isSignUp) {
-              if (isSignUp) {
-                produceSideEffect(PhoneNumberLandingScreen(Routes.homeRoute));
-              } else {
-                produceSideEffect(
-                  PhoneNumberLandingScreen(
-                    Routes.smsCertifyRoute,
-                    phoneNumber: internationalPhoneNumber,
-                  ),
-                );
-              }
+            (l) => produceSideEffect(LoginError(l)),
+            (r) {
+              produceSideEffect(LoginLandingScreen(Routes.homeRoute));
             },
           ),
         );

@@ -41,7 +41,7 @@ extension FortuneContextEx on BuildContext {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Text(
-                  error.exposureMessage ?? "No message",
+                  error.description ?? "No message",
                   style: ChipmunkTextStyle.body1Regular(fontColor: ColorName.activeDark),
                   textAlign: TextAlign.center,
                 ),
@@ -64,7 +64,7 @@ extension FortuneContextEx on BuildContext {
               if ((integerCode == HttpStatus.unauthorized || integerCode == HttpStatus.forbidden) && needToFinish) {
                 router.navigateTo(
                   this,
-                  Routes.phoneNumberRoute,
+                  Routes.loginRoute,
                   clearStack: true,
                   replace: false,
                 );
@@ -93,7 +93,7 @@ extension FortuneContextEx on BuildContext {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Text(
-                  error.message ?? 'No message',
+                  error.description ?? 'No message',
                   style: ChipmunkTextStyle.body1Regular(fontColor: ColorName.activeDark),
                 ),
               ),

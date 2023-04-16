@@ -3,22 +3,22 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 @immutable
-abstract class PhoneNumberSideEffect extends Equatable {}
+abstract class JoinSideEffect extends Equatable {}
 
-class PhoneNumberError extends PhoneNumberSideEffect {
+class JoinError extends JoinSideEffect {
   final ChipmunkFailure error;
 
-  PhoneNumberError(this.error);
+  JoinError(this.error);
 
   @override
   List<Object?> get props => [];
 }
 
-class PhoneNumberLandingScreen extends PhoneNumberSideEffect {
+class JoinLandingScreen extends JoinSideEffect {
   final String landingRoute;
   final String phoneNumber;
 
-  PhoneNumberLandingScreen(
+  JoinLandingScreen(
     this.landingRoute, {
     this.phoneNumber = "",
   });

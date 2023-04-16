@@ -17,29 +17,27 @@ class AuthService {
   });
 
   // 로그인.
-  Future<bool> signIn({
+  Future<void> signIn({
     required String phoneNumber,
     required String password,
   }) async {
     try {
-      await authClient
-          .signInWithPassword(
-        phone: phoneNumber,
-        password: password,
-      )
-          .then(
+      return await authClient.signInWithPassword(phone: phoneNumber, password: password).then(
         (value) {
           persistSession(value.session!);
-          ChipmunkLogger.debug(tag: _tag, "signIn:: persistSession()");
-          return true;
         },
       );
-      return false;
     } on AuthException catch (e) {
       throw AuthFailure(
         errorCode: e.statusCode,
         errorMessage: e.message,
-        exposureMessage: "로그인에 실패.",
+        exposureMessage: () {
+          if (e.message.contains('Invalid login')) {
+            return "아이디 혹은 비밀번호가 올바르지 않습니다.";
+          } else {
+            return "로그인 실패";
+          }
+        }(),
       );
     } catch (e) {
       throw UnknownFailure(
@@ -64,7 +62,13 @@ class AuthService {
       throw AuthFailure(
         errorCode: e.statusCode,
         errorMessage: e.message,
-        exposureMessage: "회원가입 실패",
+        exposureMessage: () {
+          if (e.message.contains('already registered')) {
+            return "이미 가입된 사용자 입니다.";
+          } else {
+            return "회원가입 실패";
+          }
+        }(),
       );
     } catch (e) {
       throw UnknownFailure(
@@ -110,6 +114,11 @@ class AuthService {
         errorMessage: e.message,
         exposureMessage: "로그아웃 실패",
       );
+    } catch (e) {
+      throw UnknownFailure(
+        errorCode: null,
+        errorMessage: e.toString(),
+      );
     }
   }
 
@@ -131,11 +140,11 @@ class AuthService {
         return Routes.homeRoute;
       } else {
         ChipmunkLogger.debug('RecoverSession:: 로그인 한 계정이 없음.');
-        return Routes.phoneNumberRoute;
+        return Routes.loginRoute;
       }
     } catch (e) {
       ChipmunkLogger.error('RecoverSession:: 계정 복구 실패. ${e.toString()}');
-      return Routes.phoneNumberRoute;
+      return Routes.loginRoute;
     }
   }
 }

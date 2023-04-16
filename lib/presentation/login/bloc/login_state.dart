@@ -1,19 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'phone_number_state.freezed.dart';
+part 'login_state.freezed.dart';
 
 @freezed
-class PhoneNumberState with _$PhoneNumberState {
-  factory PhoneNumberState({
+class LoginState with _$LoginState {
+  factory LoginState({
     required String phoneNumber,
     required String password,
     required bool isButtonEnabled,
     required String countryCode,
     required String countryName,
-  }) = _PhoneNumberState;
+  }) = _LoginState;
 
-  factory PhoneNumberState.initial() => PhoneNumberState(
+  factory LoginState.initial() => LoginState(
         phoneNumber: "",
         password: "",
         isButtonEnabled: false,

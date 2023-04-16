@@ -5,8 +5,10 @@ import 'package:chipmunk_flutter/data/service/country_code_service.dart';
 import 'package:chipmunk_flutter/data/service/user_service.dart';
 import 'package:chipmunk_flutter/domain/repository/auth_repository.dart';
 import 'package:chipmunk_flutter/domain/repository/country_repository.dart';
+import 'package:chipmunk_flutter/domain/repository/user_respository.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:chipmunk_flutter/presentation/countrycode/bloc/country_code.dart';
+import 'package:chipmunk_flutter/presentation/join/bloc/join.dart';
 import 'package:chipmunk_flutter/presentation/smsverify/bloc/sms_verify.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,7 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'presentation/phonenumber/bloc/phone_number_bloc.dart';
+import 'presentation/login/bloc/login_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -86,6 +88,11 @@ _initRepository() {
       countryCodeService: serviceLocator<CountryCodeService>(),
     ),
   );
+  serviceLocator.registerLazySingleton<UserRepository>(
+    () => UserRepository(
+      userService: serviceLocator<UserService>(),
+    ),
+  );
   serviceLocator.registerLazySingleton<AuthRepository>(
     () => AuthRepository(
       authService: serviceLocator<AuthService>(),
@@ -121,7 +128,12 @@ _initAppLogger() {
 /// Bloc.
 _initBloc() {
   serviceLocator.registerFactory(
-    () => PhoneNumberBloc(
+    () => LoginBloc(
+      authRepository: serviceLocator<AuthRepository>(),
+    ),
+  );
+  serviceLocator.registerFactory(
+    () => JoinBloc(
       authRepository: serviceLocator<AuthRepository>(),
     ),
   );
