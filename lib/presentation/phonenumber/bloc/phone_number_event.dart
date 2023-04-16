@@ -23,7 +23,28 @@ class PhoneNumberInput extends PhoneNumberEvent {
   List<Object?> get props => [];
 }
 
+class PhoneNumberPasswordInput extends PhoneNumberEvent {
+  final String password;
+
+  PhoneNumberPasswordInput(this.password);
+
+  @override
+  List<Object?> get props => [];
+}
+
 class PhoneNumberCancel extends PhoneNumberEvent {
+  @override
+  List<Object?> get props => [];
+}
+
+class PhoneNumberPasswordCancel extends PhoneNumberEvent {
+  PhoneNumberPasswordCancel();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class PhoneNumberBottomButtonClick extends PhoneNumberEvent {
   @override
   List<Object?> get props => [];
 }

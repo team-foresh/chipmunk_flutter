@@ -1,41 +1,52 @@
 import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+typedef ChipmunkResult<T> = Either<ChipmunkFailure, T>;
 
 abstract class ChipmunkFailure extends Equatable {
   final String? code;
   final String? message;
+  final String? description;
 
-  const ChipmunkFailure({
-    required this.message,
-    required this.code,
-  }) : super();
-}
-
-/// DB 에러.
-class PostgrestFailure extends ChipmunkFailure {
-  final String? errorCode;
-  final String? errorMessage;
-
-  const PostgrestFailure({
-    this.errorCode,
-    this.errorMessage,
-  }) : super(code: errorCode, message: errorMessage);
-
-  @override
-  List<Object?> get props => [message, errorCode];
+  const ChipmunkFailure({this.code, this.message, this.description}) : super();
 }
 
 /// 인증 에러.
 class AuthFailure extends ChipmunkFailure {
   final String? errorCode;
   final String? errorMessage;
+  final String? exposureMessage;
 
   const AuthFailure({
     this.errorCode,
     this.errorMessage,
-  }) : super(code: errorCode, message: errorMessage);
+    this.exposureMessage,
+  }) : super(
+          code: errorCode,
+          message: errorMessage,
+          description: exposureMessage,
+        );
+
+  @override
+  List<Object?> get props => [errorMessage, errorCode];
+}
+
+/// 공통 에러.
+class CommonFailure extends ChipmunkFailure {
+  final String? errorCode;
+  final String? errorMessage;
+  final String? exposureMessage;
+
+  const CommonFailure({
+    this.errorCode,
+    this.errorMessage,
+    this.exposureMessage,
+  }) : super(
+          code: errorCode,
+          message: errorMessage,
+          description: exposureMessage,
+        );
 
   @override
   List<Object?> get props => [message, errorCode];
@@ -45,46 +56,42 @@ class AuthFailure extends ChipmunkFailure {
 class UnknownFailure extends ChipmunkFailure {
   final String? errorCode;
   final String? errorMessage;
+  final String? exposureMessage;
 
   const UnknownFailure({
     this.errorCode,
     this.errorMessage,
-  }) : super(code: errorCode, message: errorMessage);
+    this.exposureMessage,
+  }) : super(
+          code: errorCode,
+          message: errorMessage,
+          description: exposureMessage,
+        );
 
   @override
   List<Object?> get props => [message, errorCode];
 }
 
 extension TryCatchRethrowExtension<T> on Future<T> {
-  Future<Either<ChipmunkFailure, T>> toEntity() async {
+  Future<Either<ChipmunkFailure, T>> toEither() async {
     try {
       return Right(await this);
-    } on PostgrestException catch (e) {
+    } on CommonFailure catch (e) {
       ChipmunkLogger.error(
-        '[PostgrestException] - '
+        '[UserFailure] - '
         'errorCode: ${e.code}, '
         'errorMessage: ${e.message}, '
-        'details: ${e.details}, '
-        'hint: ${e.hint}',
+        'exposureMessage: ${e.exposureMessage}',
       );
-      return Left(
-        PostgrestFailure(
-          errorCode: e.code,
-          errorMessage: e.message,
-        ),
-      );
-    } on AuthException catch (e) {
+      return Left(e);
+    } on AuthFailure catch (e) {
       ChipmunkLogger.error(
-        '[AuthException] - '
-        'errorCode: ${e.statusCode}, '
-        'errorMessage: ${e.message}, ',
+        '[AuthFailure] - '
+        'errorCode: ${e.code}, '
+        'errorMessage: ${e.message}, '
+        'exposureMessage: ${e.exposureMessage}',
       );
-      return Left(
-        AuthFailure(
-          errorCode: e.statusCode,
-          errorMessage: e.message,
-        ),
-      );
+      return Left(e);
     } catch (e) {
       ChipmunkLogger.error(
         '[UnknownFailure] - '
@@ -100,5 +107,3 @@ extension TryCatchRethrowExtension<T> on Future<T> {
     }
   }
 }
-
-typedef ChipmunkResult<T> = Either<ChipmunkFailure, T>;

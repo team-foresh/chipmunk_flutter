@@ -5,7 +5,7 @@ class ChipmunkValidator {
       r'[a-zA-Z0-9\-]{0,64}(\.[a-zA-Z0-9][a-zA-Z0-9\-]{0,25})+';
 
   static const phoneNumber = r'(^(?:[+0]9)?[0-9]{10,12}$)';
-  static const verifyCode = r'(^(?:[+0]9)?[0-9]{4}$)';
+  static const verifyCode = r'(^(?:[+0]9)?[0-9]{6}$)';
   static const nickName = r'[a-z|A-Z|0-9|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|ᆞ|ᆢ|ㆍ|ᆢ|ᄀᆞ|ᄂᆞ|ᄃᆞ|ᄅᆞ|ᄆᆞ|ᄇᆞ|ᄉᆞ|ᄋᆞ|ᄌᆞ|ᄎᆞ|ᄏᆞ|ᄐᆞ|ᄑᆞ|ᄒᆞ]';
   static const nickName2 = r'[a-z|A-Z|0-9|가-힣]';
 

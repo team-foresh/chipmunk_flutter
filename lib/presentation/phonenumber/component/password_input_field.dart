@@ -7,11 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/phone_number.dart';
 
-class PhoneNumberInputField extends StatelessWidget {
+class PasswordInputField extends StatelessWidget {
   final PhoneNumberBloc bloc;
   final TextEditingController textEditingController;
 
-  const PhoneNumberInputField(
+  const PasswordInputField(
     this.bloc, {
     Key? key,
     required this.textEditingController,
@@ -20,7 +20,6 @@ class PhoneNumberInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PhoneNumberBloc, PhoneNumberState>(
-      buildWhen: (previous, current) => previous.phoneNumber != current.phoneNumber,
       builder: (context, state) {
         return SizedBox(
           width: double.infinity,
@@ -29,22 +28,15 @@ class PhoneNumberInputField extends StatelessWidget {
             suffixIcon: "assets/icons/ic_cancel_circle.svg",
             onSuffixIconClicked: () {
               textEditingController.clear();
-              bloc.add(PhoneNumberCancel());
+              bloc.add(PhoneNumberPasswordCancel());
             },
             maxLength: 12,
             onTextChanged: (text) {
-              bloc.add(PhoneNumberInput(text));
+              bloc.add(PhoneNumberPasswordInput(text));
             },
-            keyboardType: TextInputType.phone,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            hint: 'require_certify_phone_number_hint'.tr(),
-            errorMessage: () {
-              if (state.phoneNumber.isNotEmpty && !ChipmunkValidator.isValidPhoneNumber(state.phoneNumber)) {
-                return 'require_certify_phone_number_error'.tr();
-              } else {
-                return null;
-              }
-            }(),
+            keyboardType: TextInputType.text,
+            hint: 'require_certify_password_hint'.tr(),
+            errorMessage: null,
           ),
         );
       },

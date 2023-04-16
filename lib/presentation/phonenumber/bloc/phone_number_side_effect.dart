@@ -13,3 +13,16 @@ class PhoneNumberError extends PhoneNumberSideEffect {
   @override
   List<Object?> get props => [];
 }
+
+class PhoneNumberLandingScreen extends PhoneNumberSideEffect {
+  final String landingRoute;
+  final String phoneNumber;
+
+  PhoneNumberLandingScreen(
+    this.landingRoute, {
+    this.phoneNumber = "",
+  });
+
+  @override
+  List<Object?> get props => [];
+}

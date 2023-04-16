@@ -17,33 +17,33 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   void _signUp() async {
-    final AuthService authService = serviceLocator<AuthService>();
-    await authService
-        .signUpWithPhoneNumber(
-          phoneNumber: "+821049307013",
-          password: "12345678",
-        )
-        .then(
-          (res) => res.fold(
-            (l) {},
-            (r) => authService.persistSession(r.session!),
-          ),
-        );
+    // final AuthService authService = serviceLocator<AuthService>();
+    // await authService
+    //     .signUpWithPhoneNumber(
+    //       phoneNumber: "+821049307013",
+    //       password: "12345678",
+    //     )
+    //     .then(
+    //       (res) => res.fold(
+    //         (l) {},
+    //         (r) => authService.persistSession(r.session!),
+    //       ),
+    //     );
   }
 
   void _signIn() async {
-    final AuthService authService = serviceLocator<AuthService>();
-    await authService
-        .signInWithPhoneNumber(
-          phoneNumber: "+821049307013",
-          password: "12345678",
-        )
-        .then(
-          (res) => res.fold(
-            (l) {},
-            (r) => authService.persistSession(r.session!),
-          ),
-        );
+    // final AuthService authService = serviceLocator<AuthService>();
+    // await authService
+    //     .signInWithPhoneNumber(
+    //       phoneNumber: "+821049307013",
+    //       password: "12345678",
+    //     )
+    //     .then(
+    //       (res) => res.fold(
+    //         (l) {},
+    //         (r) => authService.persistSession(r.session!),
+    //       ),
+    //     );
   }
 
   @override

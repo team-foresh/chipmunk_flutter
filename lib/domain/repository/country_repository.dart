@@ -1,6 +1,8 @@
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/data/service/country_code_service.dart';
 import 'package:chipmunk_flutter/domain/entity/country_code_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 
 class CountryCodeRepository {
   final CountryCodeService countryCodeService;
@@ -10,7 +12,11 @@ class CountryCodeRepository {
   });
 
   Future<ChipmunkResult<List<CountryCodeEntity>>> getCountryCode() async {
-    final remoteData = await countryCodeService.getCountryCodes().toEntity();
-    return remoteData;
+    try {
+      final remoteData = await countryCodeService.getCountryCodes();
+      return Right(remoteData);
+    } on ChipmunkFailure catch (e) {
+      return Left(e);
+    }
   }
 }

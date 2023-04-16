@@ -4,9 +4,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'phone_number_state.freezed.dart';
 
 @freezed
-class PhoneNumberState with _$PhoneNumberState{
+class PhoneNumberState with _$PhoneNumberState {
   factory PhoneNumberState({
     required String phoneNumber,
+    required String password,
     required bool isButtonEnabled,
     required String countryCode,
     required String countryName,
@@ -14,9 +15,9 @@ class PhoneNumberState with _$PhoneNumberState{
 
   factory PhoneNumberState.initial() => PhoneNumberState(
         phoneNumber: "",
+        password: "",
         isButtonEnabled: false,
         countryCode: '+82',
         countryName: 'default_country_name'.tr(),
       );
-
 }

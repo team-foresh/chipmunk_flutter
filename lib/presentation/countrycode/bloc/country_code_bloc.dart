@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/data/service/country_code_service.dart';
-import 'package:chipmunk_flutter/domain/country_repository.dart';
+import 'package:chipmunk_flutter/domain/repository/country_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:side_effect_bloc/side_effect_bloc.dart';
 

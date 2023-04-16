@@ -9,12 +9,13 @@ import '../bloc/phone_number.dart';
 class PhoneNumberBottomButton extends StatelessWidget {
   final bool isKeyboardVisible;
   final FluroRouter router;
+  final PhoneNumberBloc bloc;
 
-  const PhoneNumberBottomButton(
-    this.isKeyboardVisible,
-    this.router, {
-    super.key,
-  });
+  const PhoneNumberBottomButton(this.isKeyboardVisible,
+      this.router,
+      this.bloc, {
+        super.key,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class PhoneNumberBottomButton extends StatelessWidget {
           isKeyboardVisible: isKeyboardVisible,
           isEnabled: state.isButtonEnabled,
           onPress: () {
+            bloc.add(PhoneNumberBottomButtonClick());
             // router.navigateTo(
             //   context,
             //   Routes.smsCertifyRoute,

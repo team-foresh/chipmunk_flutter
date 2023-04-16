@@ -1,6 +1,7 @@
 import 'package:chipmunk_flutter/presentation/board/board_page.dart';
 import 'package:chipmunk_flutter/presentation/countrycode/country_code_page.dart';
 import 'package:chipmunk_flutter/presentation/phonenumber/phone_number_page.dart';
+import 'package:chipmunk_flutter/presentation/smsverify/sms_verify_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,16 @@ class ChipmunkRouter {
   static var homeHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
       return BoardPage();
+    },
+  );
+
+  static var smsCertifyHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
+      final args = context?.settings?.arguments as SmsVerifyArgs?;
+      final phoneNumber = args?.phoneNumber ?? "";
+      return SmsVerifyPage(
+        phoneNumber: phoneNumber,
+      );
     },
   );
 
@@ -41,10 +52,17 @@ class ChipmunkRouter {
         transitionType: TransitionType.fadeIn,
       )
 
-      /// 홈..
+      /// 홈.
       ..define(
         Routes.homeRoute,
         handler: homeHandler,
+        transitionType: TransitionType.fadeIn,
+      )
+
+      /// SMS 인증 화면.
+      ..define(
+        Routes.smsCertifyRoute,
+        handler: smsCertifyHandler,
         transitionType: TransitionType.fadeIn,
       )
 
@@ -60,5 +78,6 @@ class ChipmunkRouter {
 class Routes {
   static const String homeRoute = 'homeRoute';
   static const String phoneNumberRoute = 'phoneNumberRoute';
+  static const String smsCertifyRoute = 'smsCertifyRoute';
   static const String countryCodeRoute = 'countryCodeRoute';
 }

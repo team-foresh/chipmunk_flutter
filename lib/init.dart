@@ -3,9 +3,11 @@ import 'package:chipmunk_flutter/data/service/auth_service.dart';
 import 'package:chipmunk_flutter/data/service/board_service.dart';
 import 'package:chipmunk_flutter/data/service/country_code_service.dart';
 import 'package:chipmunk_flutter/data/service/user_service.dart';
-import 'package:chipmunk_flutter/domain/country_repository.dart';
+import 'package:chipmunk_flutter/domain/repository/auth_repository.dart';
+import 'package:chipmunk_flutter/domain/repository/country_repository.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:chipmunk_flutter/presentation/countrycode/bloc/country_code.dart';
+import 'package:chipmunk_flutter/presentation/smsverify/bloc/sms_verify.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -28,6 +30,7 @@ init() async {
 
   /// 로컬 데이터 - Preference.
   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  serviceLocator.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   /// Supabase todo url이랑 키값 옮겨야됨.
   await Supabase.initialize(
@@ -35,11 +38,6 @@ init() async {
     anonKey:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inppamhrb25paHJpd2ZyZmZlZndtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MTE3MDU1MSwiZXhwIjoxOTk2NzQ2NTUxfQ.qdyZq-TWQQ41azrCCgax0Y0mN4iNAaNXdF69lngJPOI",
     debug: false,
-    schema: 'public',
-    headers: {
-      'apikey':
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inppamhrb25paHJpd2ZyZmZlZndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODExNzA1NTEsImV4cCI6MTk5Njc0NjU1MX0.BiXrxBGJVHpbdQWZGLhQD5tDPxU7ZrILVElac_ZP6P4'
-    },
   );
 
   /// data.
@@ -51,19 +49,8 @@ init() async {
   /// Bloc.
   _initBloc();
 
-  /// 계정 서비스.
-  serviceLocator.registerLazySingleton<AuthService>(
-    () => AuthService(
-      authClient: Supabase.instance.client.auth,
-      preferences: sharedPreferences,
-    ),
-  );
-
   /// Router.
   serviceLocator.registerLazySingleton<ChipmunkRouter>(() => ChipmunkRouter()..init());
-
-  /// SharedPreferences
-  serviceLocator.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 }
 
 _initService() {
@@ -78,10 +65,17 @@ _initService() {
       serviceLocator<UserService>(),
     ),
   );
-
   serviceLocator.registerLazySingleton<CountryCodeService>(
     () => CountryCodeService(
       Supabase.instance.client,
+    ),
+  );
+
+  /// 계정 서비스.
+  serviceLocator.registerLazySingleton<AuthService>(
+    () => AuthService(
+      authClient: Supabase.instance.client.auth,
+      preferences: serviceLocator<SharedPreferences>(),
     ),
   );
 }
@@ -92,6 +86,12 @@ _initRepository() {
       countryCodeService: serviceLocator<CountryCodeService>(),
     ),
   );
+  serviceLocator.registerLazySingleton<AuthRepository>(
+    () => AuthRepository(
+      authService: serviceLocator<AuthService>(),
+      userService: serviceLocator<UserService>(),
+    ),
+  );
 }
 
 /// 로거.
@@ -99,7 +99,7 @@ _initAppLogger() {
   final appLogger = AppLogger(
     Logger(
       printer: PrettyPrinter(
-        methodCount: 3,
+        methodCount: 5,
         // 보이는 메소드 콜 갯수.
         errorMethodCount: 8,
         // 보이는 에러 메소드 콜 갯수.
@@ -120,10 +120,19 @@ _initAppLogger() {
 
 /// Bloc.
 _initBloc() {
-  serviceLocator.registerFactory(() => PhoneNumberBloc());
+  serviceLocator.registerFactory(
+    () => PhoneNumberBloc(
+      authRepository: serviceLocator<AuthRepository>(),
+    ),
+  );
   serviceLocator.registerFactory(
     () => CountryCodeBloc(
       countryCodeRepository: serviceLocator<CountryCodeRepository>(),
+    ),
+  );
+  serviceLocator.registerFactory(
+    () => SmsVerifyBloc(
+      authRepository: serviceLocator<AuthRepository>(),
     ),
   );
 }

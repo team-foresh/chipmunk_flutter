@@ -1,7 +1,10 @@
+import 'package:chipmunk_flutter/core/error/chipmunk_error_dialog.dart';
 import 'package:chipmunk_flutter/core/util/textstyle.dart';
 import 'package:chipmunk_flutter/core/widgets/chipmunk_scaffold.dart';
 import 'package:chipmunk_flutter/init.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
+import 'package:chipmunk_flutter/presentation/phonenumber/component/password_input_field.dart';
+import 'package:chipmunk_flutter/presentation/smsverify/sms_verify_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -50,12 +53,14 @@ class _PhoneNumberPage extends StatefulWidget {
 class _PhoneNumberPageState extends State<_PhoneNumberPage> {
   late PhoneNumberBloc bloc;
   late TextEditingController phonNumberTextEditingController;
+  late TextEditingController passwordTextEditingController;
   final router = serviceLocator<ChipmunkRouter>().router;
 
   @override
   void initState() {
     bloc = BlocProvider.of<PhoneNumberBloc>(context);
     phonNumberTextEditingController = TextEditingController();
+    passwordTextEditingController = TextEditingController();
     super.initState();
   }
 
@@ -69,7 +74,19 @@ class _PhoneNumberPageState extends State<_PhoneNumberPage> {
   Widget build(BuildContext context) {
     return BlocSideEffectListener<PhoneNumberBloc, PhoneNumberSideEffect>(
       listener: (context, sideEffect) {
-        if (sideEffect is PhoneNumberError) {}
+        if (sideEffect is PhoneNumberError) {
+          context.handleError(sideEffect.error);
+        } else if (sideEffect is PhoneNumberLandingScreen) {
+          router.navigateTo(
+            context,
+            sideEffect.landingRoute,
+            routeSettings: RouteSettings(
+              arguments: SmsVerifyArgs(
+                phoneNumber: sideEffect.phoneNumber,
+              ),
+            ),
+          );
+        }
       },
       child: Scaffold(
         appBar: const ChipmunkEmptyAppBar(),
@@ -101,6 +118,11 @@ class _PhoneNumberPageState extends State<_PhoneNumberPage> {
                                 bloc,
                                 textEditingController: phonNumberTextEditingController,
                               ),
+                              SizedBox(height: 20.h),
+                              PasswordInputField(
+                                bloc,
+                                textEditingController: passwordTextEditingController,
+                              ),
                             ],
                           ),
                         ),
@@ -114,7 +136,11 @@ class _PhoneNumberPageState extends State<_PhoneNumberPage> {
                         bottom: isKeyboardVisible ? 0 : 20.h,
                       ),
                       curve: Curves.easeInOut,
-                      child: PhoneNumberBottomButton(isKeyboardVisible, router),
+                      child: PhoneNumberBottomButton(
+                        isKeyboardVisible,
+                        router,
+                        bloc,
+                      ),
                     ),
                   ],
                 ),

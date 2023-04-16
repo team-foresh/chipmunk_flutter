@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/core/gen/colors.gen.dart';
@@ -13,6 +15,7 @@ extension FortuneContextEx on BuildContext {
   void handleError(
     ChipmunkFailure error, {
     Function0? btnOkOnPress,
+    bool needToFinish = true,
   }) {
     final router = serviceLocator<ChipmunkRouter>().router;
 
@@ -38,8 +41,9 @@ extension FortuneContextEx on BuildContext {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Text(
-                  error.message ?? "No message",
+                  error.exposureMessage ?? "No message",
                   style: ChipmunkTextStyle.body1Regular(fontColor: ColorName.activeDark),
+                  textAlign: TextAlign.center,
                 ),
               ),
               SizedBox(height: 32.h),
@@ -56,12 +60,15 @@ extension FortuneContextEx on BuildContext {
         btnOkText: "확인",
         btnOkOnPress: btnOkOnPress ??
             () {
-              router.navigateTo(
-                    this,
-                    Routes.phoneNumberRoute,
-                    clearStack: true,
-                    replace: false,
-                  );
+              final integerCode = int.parse(error.errorCode ?? "");
+              if ((integerCode == HttpStatus.unauthorized || integerCode == HttpStatus.forbidden) && needToFinish) {
+                router.navigateTo(
+                  this,
+                  Routes.phoneNumberRoute,
+                  clearStack: true,
+                  replace: false,
+                );
+              }
             },
       ).show();
     } else {

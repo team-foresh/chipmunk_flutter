@@ -1,15 +1,15 @@
-import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
+import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
-import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
+  static const supabaseSessionKey = 'supabase_session';
+  static const _tag = '[AuthService] ';
+
   final GoTrueClient authClient;
   final SharedPreferences preferences;
-
-  static const supabaseSessionKey = 'supabase_session';
 
   AuthService({
     required this.authClient,
@@ -17,47 +17,100 @@ class AuthService {
   });
 
   // 로그인.
-  Future<Either<ChipmunkFailure, AuthResponse>> signInWithPhoneNumber({
+  Future<bool> signIn({
     required String phoneNumber,
     required String password,
   }) async {
-    return await authClient
-        .signInWithPassword(
-          phone: phoneNumber,
-          password: password,
-        )
-        .toEntity();
+    try {
+      await authClient
+          .signInWithPassword(
+        phone: phoneNumber,
+        password: password,
+      )
+          .then(
+        (value) {
+          persistSession(value.session!);
+          ChipmunkLogger.debug(tag: _tag, "signIn:: persistSession()");
+          return true;
+        },
+      );
+      return false;
+    } on AuthException catch (e) {
+      throw AuthFailure(
+        errorCode: e.statusCode,
+        errorMessage: e.message,
+        exposureMessage: "로그인에 실패.",
+      );
+    } catch (e) {
+      throw UnknownFailure(
+        errorCode: null,
+        errorMessage: e.toString(),
+      );
+    }
   }
 
   // 회원가입.
-  Future<Either<ChipmunkFailure, AuthResponse>> signUpWithPhoneNumber({
+  Future<AuthResponse> signUp({
     required String phoneNumber,
     required String password,
   }) async {
-    return await authClient
-        .signUp(
-          phone: phoneNumber,
-          password: password,
-        )
-        .toEntity();
+    try {
+      final response = await authClient.signUp(
+        phone: phoneNumber,
+        password: password,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw AuthFailure(
+        errorCode: e.statusCode,
+        errorMessage: e.message,
+        exposureMessage: "회원가입 실패",
+      );
+    } catch (e) {
+      throw UnknownFailure(
+        errorCode: null,
+        errorMessage: e.toString(),
+      );
+    }
   }
 
   // 휴대폰번호 인증.
-  Future<Either<ChipmunkFailure, AuthResponse>> verifyPhoneNumber({
-    required String number,
+  Future<AuthResponse> verifyPhoneNumber({
+    required String otpCode,
+    required String phoneNumber,
   }) async {
-    return await authClient
-        .verifyOTP(
-          token: number,
-          phone: authClient.currentUser?.phone,
-          type: OtpType.sms,
-        )
-        .toEntity();
+    try {
+      final response = await authClient.verifyOTP(
+        token: otpCode,
+        phone: phoneNumber,
+        type: OtpType.sms,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw AuthFailure(
+        errorCode: e.statusCode,
+        errorMessage: e.message,
+        exposureMessage: "휴대폰번호 인증 실패",
+      );
+    } catch (e) {
+      throw UnknownFailure(
+        errorCode: null,
+        errorMessage: e.toString(),
+      );
+    }
   }
 
   // 로그아웃.
-  Future<Either<ChipmunkFailure, void>> signOut() async {
-    return await authClient.signOut().toEntity();
+  Future<void> signOut() async {
+    try {
+      await authClient.signOut();
+    } on AuthException catch (e) {
+      throw AuthFailure(
+        errorCode: e.statusCode,
+        errorMessage: e.message,
+        exposureMessage: "로그아웃 실패",
+      );
+    }
   }
 
   // 세션 유지.
