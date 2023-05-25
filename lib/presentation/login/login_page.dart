@@ -1,12 +1,8 @@
 import 'dart:async';
 
 import 'package:chipmunk_flutter/core/error/chipmunk_error_dialog.dart';
-import 'package:chipmunk_flutter/core/gen/colors.gen.dart';
-import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/core/util/textstyle.dart';
-import 'package:chipmunk_flutter/core/util/validators.dart';
 import 'package:chipmunk_flutter/core/widgets/bottomsheet/bottom_sheet_ext.dart';
-import 'package:chipmunk_flutter/core/widgets/button/chipmunk_text_button.dart';
 import 'package:chipmunk_flutter/core/widgets/chipmunk_scaffold.dart';
 import 'package:chipmunk_flutter/init.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
@@ -14,12 +10,13 @@ import 'package:chipmunk_flutter/presentation/login/bloc/login.dart';
 import 'package:chipmunk_flutter/presentation/login/component/login_bottom_button.dart';
 import 'package:chipmunk_flutter/presentation/smsverify/sms_verify_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:side_effect_bloc/side_effect_bloc.dart';
 
 import '../agreeterms/agree_terms_bottom_sheet.dart';
+import 'component/login_phone_number.dart';
+import 'component/login_verify_code_number.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({
@@ -173,7 +170,7 @@ class _LoginPageState extends State<_LoginPage> {
                                   physics: const BouncingScrollPhysics(),
                                   initialItemCount: state.steppers.length,
                                   itemBuilder: (context, index, animation) {
-                                    return _createItem(
+                                    return _createStep(
                                       state: state,
                                       context: context,
                                       index: index,
@@ -219,7 +216,7 @@ class _LoginPageState extends State<_LoginPage> {
     );
   }
 
-  Widget _createItem({
+  Widget _createStep({
     required LoginState state,
     required BuildContext context,
     required int index,
@@ -229,68 +226,28 @@ class _LoginPageState extends State<_LoginPage> {
       case LoginStepper.phoneNumber:
         return SizeTransition(
           sizeFactor: animation,
-          child: TextFormField(
-            autofocus: true,
-            maxLength: 13,
-            style: ChipmunkTextStyle.button1Medium(),
-            controller: _phoneNumberController,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onChanged: (value) => _bloc.add(LoginPhoneNumberInput(value)),
-            decoration: InputDecoration(
-              isDense: false,
-              hintText: "휴대폰 번호를 입력하세요",
-              contentPadding: EdgeInsets.all(16),
-              counterText: "",
-              hintStyle: ChipmunkTextStyle.subTitle3Regular(fontColor: ColorName.deActive),
-              errorText: ChipmunkValidator.isValidPhoneNumber(state.phoneNumber) || state.phoneNumber.isEmpty
-                  ? null
-                  : "올바른 휴대폰 번호가 아닙니다.",
-              errorStyle: ChipmunkTextStyle.body3Regular(fontColor: ColorName.negative),
-            ),
+          child: LoginPhoneNumber(
+            phoneNumber: state.phoneNumber,
+            phoneNumberController: _phoneNumberController,
+            onTextChanged: (text) => _bloc.add(LoginPhoneNumberInput(text)),
           ),
         );
 
       case LoginStepper.signInWithOtp:
         return SizeTransition(
           sizeFactor: animation,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: TextFormField(
-                    autofocus: true,
-                    style: ChipmunkTextStyle.button1Medium(),
-                    controller: _verifyCodeController,
-                    onChanged: (value) => _bloc.add(LoginVerifyCodeInput(verifyCode: value)),
-                    decoration: InputDecoration(
-                      isDense: false,
-                      hintText: "인증번호를 입력하세요",
-                      contentPadding: EdgeInsets.all(16),
-                      counterText: "",
-                      hintStyle: ChipmunkTextStyle.subTitle3Regular(fontColor: ColorName.deActive),
-                      errorText: ChipmunkValidator.isValidVerifyCode(state.verifyCode) || state.verifyCode.isEmpty
-                          ? null
-                          : "인증번호는 숫자 6자리입니다.",
-                      errorStyle: ChipmunkTextStyle.body3Regular(fontColor: ColorName.negative),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                ChipmunkTextButton(
-                  onPress: state.isRequestVerifyCodeEnable ? () => _bloc.add(LoginRequestVerifyCode()) : null,
-                  text: '인증번호 요청',
-                ),
-              ],
-            ),
+          child: LoginVerifyCodeNumber(
+            verifyCodeController: _verifyCodeController,
+            verifyCode: state.verifyCode,
+            onTextChanged: (text) {
+              _bloc.add(LoginVerifyCodeInput(verifyCode: text));
+            },
+            isRequestVerifyCodeEnable: state.isRequestVerifyCodeEnable,
+            onRequestClick: () => _bloc.add(LoginRequestVerifyCode()),
           ),
         );
       default:
-        return Container();
+        return const SizedBox.shrink();
     }
   }
 }
