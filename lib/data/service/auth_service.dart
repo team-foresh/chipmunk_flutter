@@ -1,39 +1,40 @@
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/core/util/logger.dart';
+import 'package:chipmunk_flutter/data/response/agree_terms_response.dart';
+import 'package:chipmunk_flutter/data/service_ext.dart';
+import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
+  static const _agreeTermsTableName = "agree_terms";
   static const supabaseSessionKey = 'supabase_session';
   static const _tag = '[AuthService] ';
 
   final GoTrueClient authClient;
   final SharedPreferences preferences;
+  final SupabaseClient client;
 
   AuthService({
+    required this.client,
     required this.authClient,
     required this.preferences,
   });
 
   // 로그인.
-  Future<void> signIn({
+  Future<void> signInWithOtp({
     required String phoneNumber,
-    required String password,
   }) async {
     try {
-      return await authClient.signInWithPassword(phone: phoneNumber, password: password).then(
-        (value) {
-          persistSession(value.session!);
-        },
-      );
+      return await authClient.signInWithOtp(phone: phoneNumber);
     } on AuthException catch (e) {
       throw AuthFailure(
         errorCode: e.statusCode,
         errorMessage: e.message,
         exposureMessage: () {
           if (e.message.contains('Invalid login')) {
-            return "아이디 혹은 비밀번호가 올바르지 않습니다.";
+            return "인증번호 전송에 실패 했습니다.";
           } else {
             return "로그인 실패";
           }
@@ -78,7 +79,7 @@ class AuthService {
     }
   }
 
-  // 휴대폰번호 인증.
+  // 휴대폰 번호 인증.
   Future<AuthResponse> verifyPhoneNumber({
     required String otpCode,
     required String phoneNumber,
@@ -89,6 +90,7 @@ class AuthService {
         phone: phoneNumber,
         type: OtpType.sms,
       );
+      persistSession(response.session!);
       return response;
     } on AuthException catch (e) {
       throw AuthFailure(
@@ -122,9 +124,29 @@ class AuthService {
     }
   }
 
+  // 필수/선택 약관 목록 받아오기.
+  Future<List<AgreeTermsEntity>> getTerms() async {
+    try {
+      final List<dynamic> response = await client.from(_agreeTermsTableName).select("*").toSelect();
+      final terms = response.map((e) => AgreeTermsResponse.fromJson(e)).toList();
+      return terms;
+    } on PostgrestException catch (e) {
+      throw CommonFailure(
+        errorCode: e.code,
+        errorMessage: e.message,
+        exposureMessage: "사용자를 찾을 수 없습니다.",
+      );
+    } catch (e) {
+      throw UnknownFailure(
+        errorCode: null,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
   // 세션 유지.
   Future<void> persistSession(Session session) async {
-    ChipmunkLogger.debug('PersistSession:: ${session.persistSessionString}');
+    ChipmunkLogger.info('PersistSession:: ${session.persistSessionString}');
     await preferences.setString(supabaseSessionKey, session.persistSessionString);
   }
 
@@ -132,14 +154,14 @@ class AuthService {
   Future<String> recoverSession() async {
     try {
       if (preferences.containsKey(supabaseSessionKey)) {
-        ChipmunkLogger.debug('RecoverSession:: 로그인 한 계정이 있음.');
+        ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 있음.');
         final jsonStr = preferences.getString(supabaseSessionKey)!;
         final response = await authClient.recoverSession(jsonStr);
-        ChipmunkLogger.debug('RecoverSession:: 계정 복구 성공. >> ${response.user!.email}');
+        ChipmunkLogger.info('RecoverSession:: 계정 복구 성공. >> ${response.user!.email}');
         persistSession(response.session!);
         return Routes.homeRoute;
       } else {
-        ChipmunkLogger.debug('RecoverSession:: 로그인 한 계정이 없음.');
+        ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 없음.');
         return Routes.loginRoute;
       }
     } catch (e) {

@@ -1,3 +1,4 @@
+import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -7,17 +8,34 @@ part 'login_state.freezed.dart';
 class LoginState with _$LoginState {
   factory LoginState({
     required String phoneNumber,
-    required String password,
+    required String verifyCode,
+    required String guideTitle,
+    required bool isRequestVerifyCodeEnable,
     required bool isButtonEnabled,
-    required String countryCode,
-    required String countryName,
+    required int verifyTime,
+    required List<LoginStepper> steppers,
   }) = _LoginState;
 
-  factory LoginState.initial() => LoginState(
-        phoneNumber: "",
-        password: "",
-        isButtonEnabled: false,
-        countryCode: '+82',
-        countryName: 'default_country_name'.tr(),
+  factory LoginState.initial([String? phoneNumber]) => LoginState(
+        phoneNumber: phoneNumber ?? "01049307013",
+        isButtonEnabled: true,
+        verifyCode: "",
+        verifyTime: 0,
+        isRequestVerifyCodeEnable: true,
+        guideTitle: 'loginGuideTitle.phoneNumber'.tr(),
+        steppers: [LoginStepper.phoneNumber],
       );
+}
+
+enum LoginStepper {
+  phoneNumber,
+  signInWithOtp,
+}
+
+abstract class LoginGuideTitle {
+  static String get phoneNumber => 'loginGuideTitle.phoneNumber'.tr();
+
+  static String get signInWithOtp => 'loginGuideTitle.signInWithOtp'.tr();
+
+  static String get signInWithOtpNewMember => 'loginGuideTitle.signInWithOtpNewMember'.tr();
 }

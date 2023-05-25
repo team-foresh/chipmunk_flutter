@@ -88,7 +88,7 @@ extension FortuneContextEx on BuildContext {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 32.h),
-              Text(error.code.toString(), style: ChipmunkTextStyle.subTitle1Bold(fontColor: ColorName.active)),
+              Text(error.code ?? "알 수 없는 에러", style: ChipmunkTextStyle.subTitle1Bold(fontColor: ColorName.active)),
               SizedBox(height: 8.h),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),

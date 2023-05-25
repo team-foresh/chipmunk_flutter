@@ -10,16 +10,20 @@ class UserResponse extends UserEntity {
   @JsonKey(name: 'nickname')
   final String? nickname_;
   @JsonKey(name: 'verified')
-  final bool verified_;
+  final bool? verified_;
+  @JsonKey(name: 'agree_terms')
+  final bool? agreeTerms_;
 
   UserResponse({
     this.phone_,
-    this.verified_ = false,
+    this.verified_,
     this.nickname_,
+    this.agreeTerms_,
   }) : super(
           nickname: nickname_ ?? "",
           phone: phone_ ?? "",
-          verified: verified_,
+          verified: verified_ ?? false,
+          agreeTerms: agreeTerms_ ?? false,
         );
 
   factory UserResponse.fromJson(Map<String, dynamic> json) => _$UserResponseFromJson(json);

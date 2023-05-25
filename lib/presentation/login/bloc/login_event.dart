@@ -1,3 +1,4 @@
+import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -5,10 +6,9 @@ import 'package:flutter/material.dart';
 abstract class LoginEvent extends Equatable {}
 
 class LoginInit extends LoginEvent {
-  final String? countryCode;
-  final String? countryName;
+  final String phoneNumber;
 
-  LoginInit(this.countryCode, this.countryName);
+  LoginInit(this.phoneNumber);
 
   @override
   List<Object?> get props => [];
@@ -23,22 +23,12 @@ class LoginPhoneNumberInput extends LoginEvent {
   List<Object?> get props => [];
 }
 
-class LoginPasswordInput extends LoginEvent {
-  final String password;
+class LoginVerifyCodeInput extends LoginEvent {
+  final String verifyCode;
 
-  LoginPasswordInput(this.password);
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoginPhoneNumberCancel extends LoginEvent {
-  @override
-  List<Object?> get props => [];
-}
-
-class LoginPasswordCancel extends LoginEvent {
-  LoginPasswordCancel();
+  LoginVerifyCodeInput({
+    required this.verifyCode,
+  });
 
   @override
   List<Object?> get props => [];
@@ -49,12 +39,12 @@ class LoginBottomButtonClick extends LoginEvent {
   List<Object?> get props => [];
 }
 
-class LoginChangeCountryCode extends LoginEvent {
-  final String countryCode;
-  final String countryName;
+class LoginRequestVerifyCode extends LoginEvent {
+  @override
+  List<Object?> get props => [];
+}
 
-  LoginChangeCountryCode(this.countryCode, this.countryName);
-
+class LoginRequestVerifyCodeCountdown extends LoginEvent {
   @override
   List<Object?> get props => [];
 }

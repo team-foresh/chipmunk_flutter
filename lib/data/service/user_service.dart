@@ -8,7 +8,7 @@ class UserService {
   static const _tag = '[UserService] ';
   final SupabaseClient _client;
 
-  final _tableName = "user";
+  final _userTableName = "user";
 
   UserService(this._client);
 
@@ -17,7 +17,7 @@ class UserService {
     required String phone,
   }) async {
     try {
-      await _client.from(_tableName).insert(UserResponse(phone_: phone).toJson());
+      await _client.from(_userTableName).insert(UserResponse(phone_: phone).toJson());
     } on PostgrestException catch (e) {
       throw CommonFailure(
         errorCode: e.code,
@@ -37,20 +37,24 @@ class UserService {
     String phoneNumber, {
     bool? verified,
     String? nickName,
+    bool? agreeTerms,
   }) async {
     try {
       UserEntity? user = await findUserByPhone(phoneNumber);
       if (user != null) {
         await _client
-            .from(_tableName)
+            .from(_userTableName)
             .update(
               UserResponse(
                 phone_: user.phone,
                 nickname_: nickName ?? user.nickname,
                 verified_: verified ?? user.verified,
+                agreeTerms_: agreeTerms ?? user.agreeTerms,
               ).toJson(),
             )
             .eq("phone", user.phone);
+      } else {
+        throw const PostgrestException(message: '사용자가 존재하지 않습니다');
       }
     } on PostgrestException catch (e) {
       throw CommonFailure(
@@ -87,7 +91,7 @@ class UserService {
   // 휴대폰 번호로 사용자를 찾음.
   Future<UserEntity?> findUserByPhone(String phone) async {
     try {
-      final List<dynamic> response = await _client.from(_tableName).select("*").eq("phone", phone).toSelect();
+      final List<dynamic> response = await _client.from(_userTableName).select("*").eq("phone", phone).toSelect();
       if (response.isEmpty) {
         return null;
       } else {
@@ -98,12 +102,7 @@ class UserService {
       throw CommonFailure(
         errorCode: e.code,
         errorMessage: e.message,
-        exposureMessage: "사용자를 찾을 수 없습니다",
-      );
-    } on CommonFailure catch (e) {
-      throw CommonFailure(
-        errorCode: null,
-        errorMessage: e.toString(),
+        exposureMessage: "사용자를 찾을 수 없습니다.",
       );
     } catch (e) {
       throw UnknownFailure(

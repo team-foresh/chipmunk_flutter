@@ -12,7 +12,9 @@ theme() {
     appBarTheme: appBarTheme(),
     elevatedButtonTheme: elevatedButtonTheme(),
     // textTheme: textTheme(),
+    textButtonTheme: textButtonTheme(),
     bottomSheetTheme: bottomSheetTheme(),
+    checkboxTheme: _checkboxThemeData(),
     textSelectionTheme: const TextSelectionThemeData(cursorColor: ColorName.primary),
     inputDecorationTheme: inputDecorationTheme(),
     bottomNavigationBarTheme: bottomNavigationBarTheme(),
@@ -122,6 +124,59 @@ appBarTheme() {
       // For Android (dark icons)
       systemNavigationBarIconBrightness: Brightness.light,
       systemNavigationBarColor: ColorName.background,
+    ),
+  );
+}
+
+textButtonTheme() {
+  return TextButtonThemeData(
+    style: TextButton.styleFrom(
+      // 버튼의 텍스트 색상을 변경
+      foregroundColor: Colors.white,
+      // 버튼의 배경색을 변경
+      backgroundColor: ColorName.backgroundLight,
+      disabledBackgroundColor: ColorName.deActive,
+      // 버튼의 최소 크기 설정
+      minimumSize: Size(88, 36),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+    ),
+  );
+}
+
+_checkboxThemeData() {
+  return CheckboxThemeData(
+    side: const BorderSide(
+      width: 1.5,
+      color: ColorName.deActive,
+    ),
+    splashRadius: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(4.r),
+    ),
+    checkColor: MaterialStateProperty.resolveWith<Color>(
+      (states) {
+        if (states.contains(MaterialState.disabled)) {
+          return ColorName.primary; // 체크박스가 비활성화된 경우
+        }
+        return Colors.black; // 체크박스가 활성화된 경우
+      },
+    ),
+    fillColor: MaterialStateProperty.resolveWith<Color>(
+      (states) {
+        if (!states.contains(MaterialState.selected)) {
+          return ColorName.backgroundLight; // 체크박스가 비활성화된 경우
+        }
+        return ColorName.primary; // 체크박스가 활성화된 경우
+      },
+    ),
+    overlayColor: MaterialStateProperty.resolveWith<Color>(
+      (states) {
+        if (states.contains(MaterialState.disabled)) {
+          return ColorName.primary; // 체크박스가 비활성화된 경우
+        }
+        return ColorName.primary; // 체크박스가 활성화된 경우
+      },
     ),
   );
 }

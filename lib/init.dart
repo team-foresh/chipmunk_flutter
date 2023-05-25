@@ -6,9 +6,8 @@ import 'package:chipmunk_flutter/data/service/user_service.dart';
 import 'package:chipmunk_flutter/domain/repository/auth_repository.dart';
 import 'package:chipmunk_flutter/domain/repository/country_repository.dart';
 import 'package:chipmunk_flutter/domain/repository/user_respository.dart';
+import 'package:chipmunk_flutter/presentation/agreeterms/bloc/agree_terms.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
-import 'package:chipmunk_flutter/presentation/countrycode/bloc/country_code.dart';
-import 'package:chipmunk_flutter/presentation/join/bloc/join.dart';
 import 'package:chipmunk_flutter/presentation/smsverify/bloc/sms_verify.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -56,49 +55,50 @@ init() async {
 }
 
 _initService() {
-  serviceLocator.registerLazySingleton<UserService>(
-    () => UserService(
-      Supabase.instance.client,
-    ),
-  );
-  serviceLocator.registerLazySingleton<BoardService>(
-    () => BoardService(
-      Supabase.instance.client,
-      serviceLocator<UserService>(),
-    ),
-  );
-  serviceLocator.registerLazySingleton<CountryCodeService>(
-    () => CountryCodeService(
-      Supabase.instance.client,
-    ),
-  );
-
-  /// 계정 서비스.
-  serviceLocator.registerLazySingleton<AuthService>(
-    () => AuthService(
-      authClient: Supabase.instance.client.auth,
-      preferences: serviceLocator<SharedPreferences>(),
-    ),
-  );
+  serviceLocator
+    ..registerLazySingleton<UserService>(
+      () => UserService(
+        Supabase.instance.client,
+      ),
+    )
+    ..registerLazySingleton<BoardService>(
+      () => BoardService(
+        Supabase.instance.client,
+        serviceLocator<UserService>(),
+      ),
+    )
+    ..registerLazySingleton<CountryCodeService>(
+      () => CountryCodeService(
+        Supabase.instance.client,
+      ),
+    )
+    ..registerLazySingleton<AuthService>(
+      () => AuthService(
+        client: Supabase.instance.client,
+        authClient: Supabase.instance.client.auth,
+        preferences: serviceLocator<SharedPreferences>(),
+      ),
+    );
 }
 
 _initRepository() {
-  serviceLocator.registerLazySingleton<CountryCodeRepository>(
-    () => CountryCodeRepository(
-      countryCodeService: serviceLocator<CountryCodeService>(),
-    ),
-  );
-  serviceLocator.registerLazySingleton<UserRepository>(
-    () => UserRepository(
-      userService: serviceLocator<UserService>(),
-    ),
-  );
-  serviceLocator.registerLazySingleton<AuthRepository>(
-    () => AuthRepository(
-      authService: serviceLocator<AuthService>(),
-      userService: serviceLocator<UserService>(),
-    ),
-  );
+  serviceLocator
+    ..registerLazySingleton<CountryCodeRepository>(
+      () => CountryCodeRepository(
+        countryCodeService: serviceLocator<CountryCodeService>(),
+      ),
+    )
+    ..registerLazySingleton<UserRepository>(
+      () => UserRepository(
+        serviceLocator<UserService>(),
+      ),
+    )
+    ..registerLazySingleton<AuthRepository>(
+      () => AuthRepository(
+        serviceLocator<AuthService>(),
+        serviceLocator<UserService>(),
+      ),
+    );
 }
 
 /// 로거.
@@ -127,24 +127,22 @@ _initAppLogger() {
 
 /// Bloc.
 _initBloc() {
-  serviceLocator.registerFactory(
-    () => LoginBloc(
-      authRepository: serviceLocator<AuthRepository>(),
-    ),
-  );
-  serviceLocator.registerFactory(
-    () => JoinBloc(
-      authRepository: serviceLocator<AuthRepository>(),
-    ),
-  );
-  serviceLocator.registerFactory(
-    () => CountryCodeBloc(
-      countryCodeRepository: serviceLocator<CountryCodeRepository>(),
-    ),
-  );
-  serviceLocator.registerFactory(
-    () => SmsVerifyBloc(
-      authRepository: serviceLocator<AuthRepository>(),
-    ),
-  );
+  serviceLocator
+    ..registerFactory(
+      () => LoginBloc(
+        authRepository: serviceLocator<AuthRepository>(),
+        userRepository: serviceLocator<UserRepository>(),
+      ),
+    )
+    ..registerFactory(
+      () => AgreeTermsBloc(
+        authRepository: serviceLocator<AuthRepository>(),
+        userRepository: serviceLocator<UserRepository>(),
+      ),
+    )
+    ..registerFactory(
+      () => SmsVerifyBloc(
+        authRepository: serviceLocator<AuthRepository>(),
+      ),
+    );
 }

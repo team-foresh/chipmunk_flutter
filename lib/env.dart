@@ -9,11 +9,11 @@ class Environment {
 
   Environment.create();
 
-  /// 앱에서 지원하는 언어 리스트 변수
+  /// 앱에서 지원 하는 언어 리스트 변수
   static final supportedLocales = [const Locale('en', 'US'), const Locale('ko', 'KR')];
 
   init() async {
-    /// 세로모드 고정.
+    /// 세로 모드 고정.
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
