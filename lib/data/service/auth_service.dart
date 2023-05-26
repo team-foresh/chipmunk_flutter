@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/core/util/logger.dart';
+import 'package:chipmunk_flutter/core/util/permission.dart';
 import 'package:chipmunk_flutter/data/response/agree_terms_response.dart';
 import 'package:chipmunk_flutter/data/service_ext.dart';
 import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
@@ -150,23 +153,37 @@ class AuthService {
     await preferences.setString(supabaseSessionKey, session.persistSessionString);
   }
 
-  // 세션 복구.
+  // 세션 복구
   Future<String> recoverSession() async {
-    try {
-      if (preferences.containsKey(supabaseSessionKey)) {
-        ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 있음.');
-        final jsonStr = preferences.getString(supabaseSessionKey)!;
-        final response = await authClient.recoverSession(jsonStr);
-        ChipmunkLogger.info('RecoverSession:: 계정 복구 성공. >> ${response.user!.email}');
-        persistSession(response.session!);
-        return Routes.homeRoute;
-      } else {
-        ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 없음.');
-        return Routes.loginRoute;
-      }
-    } catch (e) {
-      ChipmunkLogger.error('RecoverSession:: 계정 복구 실패. ${e.toString()}');
-      return Routes.loginRoute;
+    final isAnyPermissionDenied = await ChipmunkPermissionUtil.checkPermissionsStatus(
+      Platform.isAndroid ? ChipmunkPermissionUtil.androidPermissions : ChipmunkPermissionUtil.iosPermissions,
+    );
+    final isJoinMember = preferences.containsKey(supabaseSessionKey);
+    if (isAnyPermissionDenied && isJoinMember) {
+      return handlePermissionDeniedState();
+    } else if (isJoinMember) {
+      return handleJoinMemberState();
+    } else {
+      return handleNoLoginState();
     }
+  }
+
+  Future<String> handlePermissionDeniedState() {
+    ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 있음 (권한이 없음)');
+    return Future.value(Routes.requestPermissionRoute);
+  }
+
+  Future<String> handleJoinMemberState() async {
+    ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 있음.');
+    final jsonStr = preferences.getString(supabaseSessionKey)!;
+    final response = await authClient.recoverSession(jsonStr);
+    ChipmunkLogger.info('RecoverSession:: 계정 복구 성공. >> ${response.user!.email}');
+    persistSession(response.session!);
+    return Routes.homeRoute;
+  }
+
+  Future<String> handleNoLoginState() {
+    ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 없음.');
+    return Future.value(Routes.onBoardingRoute);
   }
 }

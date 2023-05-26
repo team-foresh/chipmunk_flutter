@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/data/service/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

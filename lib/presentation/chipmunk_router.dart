@@ -1,6 +1,7 @@
 import 'package:chipmunk_flutter/presentation/board/board_page.dart';
 import 'package:chipmunk_flutter/presentation/login/login_page.dart';
-import 'package:chipmunk_flutter/presentation/smsverify/sms_verify_page.dart';
+import 'package:chipmunk_flutter/presentation/onboarding/on_boarding_page.dart';
+import 'package:chipmunk_flutter/presentation/permission/require_permission_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,19 @@ class ChipmunkRouter {
     },
   );
 
-  static var phoneNumberHandler = Handler(
+  static var permissionHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
+      return const RequestPermissionPage();
+    },
+  );
+
+  static var onBoardingHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
+      return OnBoardingPage();
+    },
+  );
+
+  static var loginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, dynamic> params) {
       return const LoginPage();
     },
@@ -25,15 +38,29 @@ class ChipmunkRouter {
       /// 로그인.
       ..define(
         Routes.loginRoute,
-        handler: phoneNumberHandler,
-        transitionType: TransitionType.fadeIn,
+        handler: loginHandler,
+        transitionType: TransitionType.cupertino,
+      )
+
+      /// 권한요청.
+      ..define(
+        Routes.requestPermissionRoute,
+        handler: permissionHandler,
+        transitionType: TransitionType.cupertino,
+      )
+
+      /// 온보딩.
+      ..define(
+        Routes.onBoardingRoute,
+        handler: onBoardingHandler,
+        transitionType: TransitionType.cupertino,
       )
 
       /// 홈.
       ..define(
         Routes.homeRoute,
         handler: homeHandler,
-        transitionType: TransitionType.fadeIn,
+        transitionType: TransitionType.cupertino,
       );
   }
 }
@@ -41,4 +68,6 @@ class ChipmunkRouter {
 class Routes {
   static const String homeRoute = 'homeRoute';
   static const String loginRoute = 'loginRoute';
+  static const String onBoardingRoute = 'onBoarding';
+  static const String requestPermissionRoute = 'requestPermission';
 }

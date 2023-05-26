@@ -8,7 +8,6 @@ import 'package:chipmunk_flutter/init.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:chipmunk_flutter/presentation/login/bloc/login.dart';
 import 'package:chipmunk_flutter/presentation/login/component/login_bottom_button.dart';
-import 'package:chipmunk_flutter/presentation/smsverify/sms_verify_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -76,11 +75,6 @@ class _LoginPageState extends State<_LoginPage> {
           router.navigateTo(
             context,
             sideEffect.landingRoute,
-            routeSettings: RouteSettings(
-              arguments: SmsVerifyArgs(
-                phoneNumber: sideEffect.phoneNumber,
-              ),
-            ),
             clearStack: sideEffect.landingRoute == Routes.homeRoute ? true : false,
           );
         } else if (sideEffect is LoginShowTermsBottomSheet) {

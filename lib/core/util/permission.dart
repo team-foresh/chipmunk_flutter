@@ -1,13 +1,24 @@
-import 'package:alt_sms_autofill/alt_sms_autofill.dart';
-import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:dartz/dartz.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class ChipmunkPermissionUtil {
+abstract class ChipmunkPermissionUtil {
+  // 안드로이드 요청 권한.
+  static final androidPermissions = [
+    Permission.sms,
+    // Permission.storage,
+    Permission.location,
+  ];
+
+  // ios 요청 권한.
+  static final iosPermissions = [
+    // Permission.photos,
+    Permission.location,
+  ];
+
   /// 권한 요청.
   /// - 모든 권한을 한꺼번에 요청하고, 하나라도 거부될 경우 false를 리턴 함.
-  Future<bool> requestPermission(List<Permission> permissions) async {
+  static Future<bool> requestPermission(List<Permission> permissions) async {
     bool isGranted = true;
+
     Map<Permission, PermissionStatus> statuses = await permissions.request();
     statuses.forEach((key, value) {
       if (!value.isGranted) {
@@ -17,21 +28,15 @@ class ChipmunkPermissionUtil {
     return isGranted;
   }
 
-  startSmsListening(Function1 onReceive) async {
-    ChipmunkLogger.debug("_startSmsListening()");
-    String? comingSms = await AltSmsAutofill().listenForSms;
-    if (comingSms != null) {
-      String verifyCode = _getVerifyCode(comingSms);
-      ChipmunkLogger.debug("인증번호: $verifyCode");
-      if (verifyCode.length >= 6) {
-        onReceive(verifyCode);
-      }
-    }
-  }
+  static Future<bool> checkPermissionsStatus(List<Permission> permissions) async {
+    Map<Permission, PermissionStatus> statuses = {};
 
-  _getVerifyCode(String sms) {
-    RegExp regex = RegExp(r'\d{6}', multiLine: true);
-    Iterable<Match> matches = regex.allMatches(sms);
-    return matches.first.group(0);
+    for (var permission in permissions) {
+      statuses[permission] = await permission.status;
+    }
+
+    bool isAnyPermissionDenied = statuses.values.any((status) => status.isDenied);
+
+    return isAnyPermissionDenied;
   }
 }

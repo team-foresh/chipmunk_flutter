@@ -53,17 +53,17 @@ class ChipmunkEmptyAppBar extends StatelessWidget implements PreferredSizeWidget
 abstract class ChipmunkCustomAppBar {
   static leadingAppBar(
     BuildContext context, {
-    required String title,
+    String? title,
     Function0? onPressed,
   }) =>
       AppBar(
         leading: IconButton(
-          icon: Assets.icons.arrowLeft.svg(),
+          icon: Assets.icons.icArrowLeft.svg(),
           onPressed: onPressed ?? () => Navigator.pop(context),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           iconSize: 24,
         ),
-        title: Text(title),
+        title: Text(title ?? ''),
       );
 }

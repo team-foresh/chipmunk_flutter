@@ -8,7 +8,7 @@ import 'package:chipmunk_flutter/domain/repository/country_repository.dart';
 import 'package:chipmunk_flutter/domain/repository/user_respository.dart';
 import 'package:chipmunk_flutter/presentation/agreeterms/bloc/agree_terms.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
-import 'package:chipmunk_flutter/presentation/smsverify/bloc/sms_verify.dart';
+import 'package:chipmunk_flutter/presentation/permission/bloc/request_permission.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -135,14 +135,12 @@ _initBloc() {
       ),
     )
     ..registerFactory(
+      () => RequestPermissionBloc(),
+    )
+    ..registerFactory(
       () => AgreeTermsBloc(
         authRepository: serviceLocator<AuthRepository>(),
         userRepository: serviceLocator<UserRepository>(),
-      ),
-    )
-    ..registerFactory(
-      () => SmsVerifyBloc(
-        authRepository: serviceLocator<AuthRepository>(),
       ),
     );
 }
