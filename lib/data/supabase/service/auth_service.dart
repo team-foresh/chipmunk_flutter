@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/core/util/logger.dart';
 import 'package:chipmunk_flutter/core/util/permission.dart';
-import 'package:chipmunk_flutter/data/response/agree_terms_response.dart';
-import 'package:chipmunk_flutter/data/service_ext.dart';
-import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
+import 'package:chipmunk_flutter/data/supabase/response/agree_terms_response.dart';
+import 'package:chipmunk_flutter/data/supabase/service_ext.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/agree_terms_entity.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -177,7 +177,7 @@ class AuthService {
     ChipmunkLogger.info('RecoverSession:: 로그인 한 계정이 있음.');
     final jsonStr = preferences.getString(supabaseSessionKey)!;
     final response = await authClient.recoverSession(jsonStr);
-    ChipmunkLogger.info('RecoverSession:: 계정 복구 성공. >> ${response.user!.email}');
+    ChipmunkLogger.info('RecoverSession:: 계정 복구 성공. ${response.user!.email}');
     persistSession(response.session!);
     return Routes.homeRoute;
   }

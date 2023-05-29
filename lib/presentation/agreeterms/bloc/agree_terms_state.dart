@@ -1,4 +1,4 @@
-import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/agree_terms_entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'agree_terms_state.freezed.dart';

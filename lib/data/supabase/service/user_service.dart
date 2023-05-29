@@ -1,7 +1,7 @@
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
-import 'package:chipmunk_flutter/data/response/user_response.dart';
-import 'package:chipmunk_flutter/data/service_ext.dart';
-import 'package:chipmunk_flutter/domain/entity/user_entity.dart';
+import 'package:chipmunk_flutter/data/supabase/response/user_response.dart';
+import 'package:chipmunk_flutter/data/supabase/service_ext.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/user_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide UserResponse;
 
 class UserService {

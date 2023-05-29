@@ -1,11 +1,17 @@
+import 'package:chipmunk_flutter/core/network/api/chipmunk_main_error_mapper.dart';
+import 'package:chipmunk_flutter/core/network/api/service/main_service.dart';
+import 'package:chipmunk_flutter/core/network/api_service_provider.dart';
+import 'package:chipmunk_flutter/core/network/auth_helper_jwt.dart';
 import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:chipmunk_flutter/data/service/auth_service.dart';
-import 'package:chipmunk_flutter/data/service/board_service.dart';
-import 'package:chipmunk_flutter/data/service/country_code_service.dart';
-import 'package:chipmunk_flutter/data/service/user_service.dart';
-import 'package:chipmunk_flutter/domain/repository/auth_repository.dart';
-import 'package:chipmunk_flutter/domain/repository/country_repository.dart';
-import 'package:chipmunk_flutter/domain/repository/user_respository.dart';
+import 'package:chipmunk_flutter/data/main/repository/main_repository_impl.dart';
+import 'package:chipmunk_flutter/data/supabase/service/auth_service.dart';
+import 'package:chipmunk_flutter/data/supabase/service/board_service.dart';
+import 'package:chipmunk_flutter/data/supabase/service/country_code_service.dart';
+import 'package:chipmunk_flutter/data/supabase/service/user_service.dart';
+import 'package:chipmunk_flutter/domain/main/repository/main_repository.dart';
+import 'package:chipmunk_flutter/domain/supabase/repository/auth_repository.dart';
+import 'package:chipmunk_flutter/domain/supabase/repository/country_repository.dart';
+import 'package:chipmunk_flutter/domain/supabase/repository/user_respository.dart';
 import 'package:chipmunk_flutter/presentation/agreeterms/bloc/agree_terms.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';
 import 'package:chipmunk_flutter/presentation/permission/bloc/request_permission.dart';
@@ -16,6 +22,8 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'data/main/datasource/main_datasource.dart';
+import 'env.dart';
 import 'presentation/login/bloc/login_bloc.dart';
 
 final serviceLocator = GetIt.instance;
@@ -42,18 +50,49 @@ init() async {
   );
 
   /// data.
-  _initService();
+  await _initService();
 
   /// domain.
-  _initRepository();
+  await _initRepository();
 
   /// Bloc.
-  _initBloc();
+  await _initBloc();
 
   /// Router.
   serviceLocator.registerLazySingleton<ChipmunkRouter>(() => ChipmunkRouter()..init());
+
+  /// 서버.
+  await _initMainServer();
 }
 
+/// 메인 서버.
+_initMainServer() async {
+  /// 서비스 프로바이더.
+  ApiServiceProvider apiProvider = ApiServiceProvider(baseUrl: Environment.baseUrl);
+
+  /// 메인 Service..
+  serviceLocator
+    ..registerLazySingleton<AuthHelperJwt>(() => apiProvider.getAuthHelperJwt())
+    ..registerLazySingleton<MainService>(() => apiProvider.getMainService());
+
+  /// 메인 DataSource
+  serviceLocator.registerLazySingleton<MainDataSource>(
+    () => MainDataSourceImpl(serviceLocator()),
+  );
+
+  /// 메인 errorMapper..
+  serviceLocator.registerLazySingleton<ChipmunkErrorMapper>(() => ChipmunkErrorMapper());
+
+  /// 메인 repo
+  serviceLocator.registerLazySingleton<MainRepository>(
+    () => MainRepositoryImpl(
+      mainDataSource: serviceLocator(),
+      errorMapper: serviceLocator(),
+    ),
+  );
+}
+
+/// Service.
 _initService() {
   serviceLocator
     ..registerLazySingleton<UserService>(
@@ -81,6 +120,7 @@ _initService() {
     );
 }
 
+/// Repository
 _initRepository() {
   serviceLocator
     ..registerLazySingleton<CountryCodeRepository>(

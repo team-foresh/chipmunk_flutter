@@ -1,15 +1,25 @@
-import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
-typedef ChipmunkResult<T> = Either<ChipmunkFailure, T>;
+class ChipmunkException {
+  final String? errorCode;
+  final String? errorMessage;
+
+  ChipmunkException({
+    required this.errorCode,
+    required this.errorMessage,
+  });
+}
 
 abstract class ChipmunkFailure extends Equatable {
   final String? code;
   final String? message;
   final String? description;
 
-  const ChipmunkFailure({this.code, this.message, this.description}) : super();
+  const ChipmunkFailure({
+    this.code,
+    this.message,
+    this.description,
+  }) : super();
 }
 
 /// 인증 에러.
@@ -59,9 +69,9 @@ class UnknownFailure extends ChipmunkFailure {
   final String? exposureMessage;
 
   const UnknownFailure({
-    this.errorCode,
+    this.errorCode = '999',
     this.errorMessage,
-    this.exposureMessage,
+    this.exposureMessage = "알 수 없는 에러",
   }) : super(
           code: errorCode,
           message: errorMessage,

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chipmunk_flutter/domain/repository/auth_repository.dart';
-import 'package:chipmunk_flutter/domain/repository/user_respository.dart';
+import 'package:chipmunk_flutter/domain/supabase/repository/auth_repository.dart';
+import 'package:chipmunk_flutter/domain/supabase/repository/user_respository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:side_effect_bloc/side_effect_bloc.dart';
 

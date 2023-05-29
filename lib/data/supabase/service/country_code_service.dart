@@ -1,6 +1,6 @@
-import 'package:chipmunk_flutter/data/response/country_code_response.dart';
-import 'package:chipmunk_flutter/data/service_ext.dart';
-import 'package:chipmunk_flutter/domain/entity/country_code_entity.dart';
+import 'package:chipmunk_flutter/data/supabase/response/country_code_response.dart';
+import 'package:chipmunk_flutter/data/supabase/service_ext.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/country_code_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CountryCodeService {

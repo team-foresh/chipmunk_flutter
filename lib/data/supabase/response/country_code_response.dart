@@ -1,4 +1,4 @@
-import 'package:chipmunk_flutter/domain/entity/country_code_entity.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/country_code_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'country_code_response.g.dart';

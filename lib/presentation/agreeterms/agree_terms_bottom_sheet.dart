@@ -3,7 +3,7 @@ import 'package:chipmunk_flutter/core/gen/assets.gen.dart';
 import 'package:chipmunk_flutter/core/util/textstyle.dart';
 import 'package:chipmunk_flutter/core/widgets/button/chipmunk_scale_button.dart';
 import 'package:chipmunk_flutter/core/widgets/checkbox/chipmunk_check_box.dart';
-import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/agree_terms_entity.dart';
 import 'package:chipmunk_flutter/init.dart';
 import 'package:chipmunk_flutter/presentation/agreeterms/bloc/agree_terms.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_router.dart';

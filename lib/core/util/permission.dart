@@ -4,6 +4,7 @@ abstract class ChipmunkPermissionUtil {
   // 안드로이드 요청 권한.
   static final androidPermissions = [
     Permission.sms,
+    Permission.camera,
     // Permission.storage,
     Permission.location,
   ];
@@ -11,6 +12,7 @@ abstract class ChipmunkPermissionUtil {
   // ios 요청 권한.
   static final iosPermissions = [
     // Permission.photos,
+    Permission.camera,
     Permission.location,
   ];
 

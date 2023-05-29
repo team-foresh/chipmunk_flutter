@@ -1,7 +1,8 @@
 import 'package:chipmunk_flutter/core/widgets/chipmunk_scaffold.dart';
-import 'package:chipmunk_flutter/data/service/board_service.dart';
+import 'package:chipmunk_flutter/data/supabase/service/board_service.dart';
 import 'package:chipmunk_flutter/init.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class Post {
   final String image;
@@ -11,7 +12,14 @@ class Post {
   Post({required this.image, required this.title, required this.description});
 }
 
-class BoardPage extends StatelessWidget {
+class BoardPage extends StatefulWidget {
+  BoardPage({super.key});
+
+  @override
+  State<BoardPage> createState() => _BoardPageState();
+}
+
+class _BoardPageState extends State<BoardPage> {
   final List<Post> posts = [
     Post(
         image:
@@ -23,73 +31,49 @@ class BoardPage extends StatelessWidget {
     Post(image: 'https://picsum.photos/200', title: 'Post 4', description: 'This is the description of post 4'),
   ];
 
-  BoardPage({super.key});
+  String _scanBarcode = 'Unknown';
 
   @override
   Widget build(BuildContext context) {
-    return ChipmunkScaffold(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-          children: posts.map<Widget>(_buildCard).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCard(Post post) {
-    return GestureDetector(
-      onTap: () {
-        BoardService repository = serviceLocator<BoardService>();
-        // repository.getMyBoards();
-      },
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Barcode Scan Page')),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.network(
-                  post.image,
-                  fit: BoxFit.cover,
-                ),
-              ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Scan Result',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    post.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ],
+            Text(
+              _scanBarcode,
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => scanBarcode(),
+              child: const Text(
+                'Start barcode scan',
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> scanBarcode() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode("#ff6666", "Cancel", true, ScanMode.BARCODE);
+      if (!mounted) return;
+
+      setState(() {
+        _scanBarcode = barcodeScanRes;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }

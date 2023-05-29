@@ -2,10 +2,11 @@ import 'dart:math';
 
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
 import 'package:chipmunk_flutter/core/util/logger.dart';
-import 'package:chipmunk_flutter/data/service/auth_service.dart';
-import 'package:chipmunk_flutter/data/service/user_service.dart';
-import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
-import 'package:chipmunk_flutter/domain/entity/user_entity.dart';
+import 'package:chipmunk_flutter/core/util/usecase.dart';
+import 'package:chipmunk_flutter/data/supabase/service/auth_service.dart';
+import 'package:chipmunk_flutter/data/supabase/service/user_service.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/agree_terms_entity.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/user_entity.dart';
 import 'package:dartz/dartz.dart';
 import 'package:supabase/supabase.dart';
 

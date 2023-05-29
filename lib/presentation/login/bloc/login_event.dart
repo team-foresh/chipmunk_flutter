@@ -1,4 +1,3 @@
-import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,3 @@
-import 'package:chipmunk_flutter/domain/entity/agree_terms_entity.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

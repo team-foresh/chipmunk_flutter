@@ -1,4 +1,7 @@
-import 'package:chipmunk_flutter/data/service/auth_service.dart';
+import 'package:chipmunk_flutter/core/network/api/service/main_service.dart';
+import 'package:chipmunk_flutter/core/util/logger.dart';
+import 'package:chipmunk_flutter/data/supabase/service/auth_service.dart';
+import 'package:chipmunk_flutter/domain/main/repository/main_repository.dart';
 import 'package:chipmunk_flutter/env.dart';
 import 'package:chipmunk_flutter/presentation/chipmunk_app.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -8,6 +11,15 @@ import 'init.dart';
 
 void main() async {
   await init();
+
+  final repository = serviceLocator<MainRepository>();
+
+  final temp = await repository.getBookList();
+  temp.fold((l) {
+    ChipmunkLogger.error("l: ${l.code}, ${l.message}");
+  }, (r) {
+    ChipmunkLogger.info("r: ${r.documents.length}");
+  });
 
   runApp(
     EasyLocalization(

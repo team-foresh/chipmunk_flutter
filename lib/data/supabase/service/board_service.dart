@@ -1,5 +1,6 @@
-import 'package:chipmunk_flutter/data/service/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'user_service.dart';
 
 class BoardService {
   final SupabaseClient _client;

@@ -4,6 +4,8 @@
     "signInWithOtp": "잘오신거에요!\n문자로 전송된 인증번호를 입력해주세요",
     "signInWithOtpNewMember": "처음 오셨네요?\n문자로 전송된 인증번호를 입력해주세요"
   },
+  "onboarding_greeting_title": "온보딩에 잘오신거에요!\n 타이틀을 입력해주세요!",
+  "onboarding_greeting_sub_title": "서브타이틀을 입력해주세요",
   "next": "계속하기",
   "cert_expiration": "인증 오류"
 }

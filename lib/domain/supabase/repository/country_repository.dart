@@ -1,8 +1,8 @@
 import 'package:chipmunk_flutter/core/error/chipmunk_error.dart';
-import 'package:chipmunk_flutter/data/service/country_code_service.dart';
-import 'package:chipmunk_flutter/domain/entity/country_code_entity.dart';
+import 'package:chipmunk_flutter/core/util/usecase.dart';
+import 'package:chipmunk_flutter/data/supabase/service/country_code_service.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/country_code_entity.dart';
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 
 class CountryCodeRepository {
   final CountryCodeService countryCodeService;

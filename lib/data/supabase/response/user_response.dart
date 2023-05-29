@@ -1,4 +1,4 @@
-import 'package:chipmunk_flutter/domain/entity/user_entity.dart';
+import 'package:chipmunk_flutter/domain/supabase/entity/user_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_response.g.dart';
